@@ -55,16 +55,42 @@ const ActionButton = () => {
                       </Button>
                     </>
                   )}
-                  <Link href="/">Get started</Link>
-                  <Link href="/hotel-list">Hotels</Link>
-                  <Link href="/flight-list">Flights</Link>
-                  <Link href="/trip-list">Trips</Link>
-                  <Link href="/chat">Chat</Link>
-                  <Link href="/my-booking">My-booking Hotels</Link>
-                  <Link href="/my-bookings-flight">My-booking Flights</Link>
-                  <Link href="/my-bookings-trip">My-booking Trips</Link>
-                  <Link href="/">Contact</Link>
-                  <Link href="/">About</Link>
+                   <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Get started</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Chương trình học</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Đề thi online</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Flashcards</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Khóa học</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Blog</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Hỗ trợ</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Liên hệ</Link>
+                  <Link
+    href="/"
+    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
+  >Thông tin</Link>
                   <Link href="/" onClick={handleLogout}>
                     Log Out
                   </Link>

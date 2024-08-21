@@ -46,6 +46,22 @@ function LayoutProvider({
     return <>{children}</>;
   };
 
+  const getCurrentUser = async () => {
+    try {
+      const response: any = await fetchUsers();
+      if (response.error)
+        throw new Error(response.error.message);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      return;
+    }
+  };
+
+  useEffect(() => {
+    if (!isPublicRoute) getCurrentUser();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col justify-between">
       {getNavbar()}

@@ -60,52 +60,65 @@ const NavigationBar = () => {
       <NavigationMenuList className="hidden md:flex md:space-x-4">
         <NavigationMenuItem>
           <Link
-            href="/hotel-list"
+            href="/"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Hotel
+              Chương trình học
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
           <Link
-            href="/trip-list"
+            href="/"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Trips
+              Đề thi online
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
           <Link
-            href="/flight-list"
+            href="/"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Flights
+              Flashcards
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
           <Link
-            href="/chat"
+            href="/"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Chat
+              Blog
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link
+            href="/"
+            className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
+            legacyBehavior
+            passHref
+          >
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Khóa học
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>

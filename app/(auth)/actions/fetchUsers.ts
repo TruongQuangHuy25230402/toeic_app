@@ -5,9 +5,14 @@ import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export const fetchUsers = async () => {
+  console.log('fetchUsers function called');
     try {
+      
       const clerkUser = await currentUser()
+      console.log('Clerk User:', clerkUser);
+
       let mongoUser = null
+    
       mongoUser = await prisma.user.findUnique({
         where: {
           clerkUserId: clerkUser?.id

@@ -26,28 +26,28 @@ export function Action() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => {
-            router.push("/my-booking");
+            router.push("/");
           }}
         >
-          My-Booking Hotel
+          Home1
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            router.push("/my-bookings-trip");
+            router.push("/");
           }}
         >
-          My-Booking Trip
+          Home2
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            router.push("/my-bookings-flight");
+            router.push("/");
           }}
         >
-          My-Booking Flight
+         Home3
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            router.push("/admin");
+            router.push("/");
           }}
         >
           Dashboard

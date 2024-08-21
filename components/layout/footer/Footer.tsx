@@ -33,28 +33,37 @@ const Footer = () => {
       <Container>
         <div className="flex flex-col md:flex-row justify-between pt-16 pb-8">
           <FooterList>
-            <h3 className="text-base font-bold mb-2">Hotel Categories</h3>
+            <h3 className="text-base font-bold mb-2">Chương trình học</h3>
 
-            <Link href="#">Resort</Link>
-            <Link href="#">Room</Link>
-            <Link href="#">Tour</Link>
+            <Link href="#">IELTS</Link>
+            <Link href="#">TOEIC</Link>
+
           </FooterList>
 
           <FooterList>
-            <h3 className="text-base font-bold mb-2">Customer Service</h3>
+            <h3 className="text-base font-bold mb-2">Tài nguyên</h3>
 
-            <Link href="#">Contact us</Link>
-            <Link href="#">Refund & Policy</Link>
-            <Link href="#">Watches</Link>
-            <Link href="#">FAQs</Link>
+            <Link href="#">Thư viện đề thi</Link>
+            <Link href="#">Blog</Link>
+            <Link href="#">Kho tài liệu</Link>
+            <Link href="#">Nhóm học tập</Link>
+          </FooterList>
+
+          <FooterList>
+            <h3 className="text-base font-bold mb-2">Hỗ trợ</h3>
+
+            <Link href="#">Hướng dẫn sử dụng</Link>
+            <Link href="#">Hướng dẫn mua hàng</Link>
+            <Link href="#">Chăm sóc khách hàng</Link>
+            <Link href="#">Phản hồi khiếu nại</Link>
           </FooterList>
 
           <div className="w-full md:w-1/3 mb-6 md:mb-0">
-            <h3 className="text-base font-bold mb-2">About us</h3>
+            <h3 className="text-base font-bold mb-2">Thông tin</h3>
             <p className="mb-2">
-              Welcome to Resort Hotel, your ultimate destination for relaxation
-              and luxury. Nestled in breathtaking surroundings, our hotel offers
-              a perfect retreat for travelers seeking tranquility and comfort.
+            Chào mừng bạn đến với Trung Tâm Luyện Thi TOEIC của chúng tôi, nơi bạn có thể chuẩn bị tốt nhất cho kỳ thi TOEIC!
+
+Tại đây, chúng tôi cam kết hỗ trợ học viên trên toàn thế giới nâng cao kỹ năng tiếng Anh và đạt điểm cao trong kỳ thi TOEIC. Với nhiều năm kinh nghiệm trong việc giảng dạy và phát triển các khóa học TOEIC chất lượng, chúng tôi tự hào là một trong những địa chỉ uy tín giúp bạn chinh phục mục tiêu của mình.
             </p>
             <p>
               &copy; {new Date().getFullYear()} PalmTree. All rights reserved
@@ -62,7 +71,7 @@ const Footer = () => {
           </div>
 
           <FooterList>
-            <h3 className="text-base font-bold mb-2">Follow us</h3>
+            <h3 className="text-base font-bold mb-2">Theo dõi tại đây</h3>
             <div className="flex gap-2">
               <Link href="#">
                 <MdFacebook size={24} />
