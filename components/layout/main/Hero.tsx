@@ -1,7 +1,17 @@
+"use client"
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 
 const Hero = () => {
+
+  const router = useRouter();
+  
+  const handleQuiz = () => {
+    // Chuyển hướng đến trang "hotel/new"
+    router.push("/quiz");
+  };
+
   return (
     <section className="relative w-full min-h-[500px] flex items-center justify-center text-center">
       <div className="px-4 md:px-6 max-w-[1500px] mx-auto w-[90%]">
@@ -14,7 +24,7 @@ const Hero = () => {
           </p>
         </div>
         <div className="mt-6">
-          <Button
+          <Button onClick={handleQuiz}
            
             className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-gray-50 shadow transition-colors duration-500 hover:bg-primary/80"
           >

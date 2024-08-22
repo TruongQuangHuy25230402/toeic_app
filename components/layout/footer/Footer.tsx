@@ -57,20 +57,7 @@ const Footer = () => {
             <Link href="#">Chăm sóc khách hàng</Link>
             <Link href="#">Phản hồi khiếu nại</Link>
           </FooterList>
-
-          <div className="w-full md:w-1/3 mb-6 md:mb-0">
-            <h3 className="text-base font-bold mb-2">Thông tin</h3>
-            <p className="mb-2">
-            Chào mừng bạn đến với Trung Tâm Luyện Thi TOEIC của chúng tôi, nơi bạn có thể chuẩn bị tốt nhất cho kỳ thi TOEIC!
-
-Tại đây, chúng tôi cam kết hỗ trợ học viên trên toàn thế giới nâng cao kỹ năng tiếng Anh và đạt điểm cao trong kỳ thi TOEIC. Với nhiều năm kinh nghiệm trong việc giảng dạy và phát triển các khóa học TOEIC chất lượng, chúng tôi tự hào là một trong những địa chỉ uy tín giúp bạn chinh phục mục tiêu của mình.
-            </p>
-            <p>
-              &copy; {new Date().getFullYear()} PalmTree. All rights reserved
-            </p>
-          </div>
-
-          <FooterList>
+<FooterList>
             <h3 className="text-base font-bold mb-2">Theo dõi tại đây</h3>
             <div className="flex gap-2">
               <Link href="#">
@@ -90,6 +77,19 @@ Tại đây, chúng tôi cam kết hỗ trợ học viên trên toàn thế gi�
               </Link>
             </div>
           </FooterList>
+          <div className="w-full md:w-1/3 mb-6 md:mb-0">
+            <h3 className="text-base font-bold mb-2">Thông tin</h3>
+            <p className="mb-2">
+            Chào mừng bạn đến với Trung Tâm Luyện Thi TOEIC của chúng tôi, nơi bạn có thể chuẩn bị tốt nhất cho kỳ thi TOEIC!
+
+Tại đây, chúng tôi cam kết hỗ trợ học viên trên toàn thế giới nâng cao kỹ năng tiếng Anh và đạt điểm cao trong kỳ thi TOEIC. Với nhiều năm kinh nghiệm trong việc giảng dạy và phát triển các khóa học TOEIC chất lượng, chúng tôi tự hào là một trong những địa chỉ uy tín giúp bạn chinh phục mục tiêu của mình.
+            </p>
+            <p>
+              &copy; {new Date().getFullYear()} PalmTree. All rights reserved
+            </p>
+          </div>
+
+          
         </div>
       </Container>
     </footer>
