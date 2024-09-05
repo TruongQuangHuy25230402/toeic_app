@@ -12,22 +12,22 @@ interface QuizProps {
 }
 
 const Quiz = ({ questions, userId }: QuizProps) => {
-  const [activeQuestion, setActiveQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
-  const [checked, setChecked] = useState(false);
+  const [activeQuestion, setActiveQuestion] = useState(0); // câu hỏi hiện tại
+  const [selectedAnswer, setSelectedAnswer] = useState(""); // câu trả lời đã chọn
+  const [checked, setChecked] = useState(false); // kiểm tra xem user chọn chưa
   const [selectedAnswerIndex, setSelectedAnswerIndex] =
-    useState<number | null>(null);
+    useState<number | null>(null); // mục của câu trả lời đã chọn
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState({
     score: 0,
     correctAnswers: 0,
     wrongAnswers: 0,
-  });
-  const [timeRemaining, setTimeRemaining] = useState(25);
-  const [timerRunning, setTimerRunning] = useState(false);
+  }); // hiển thị kết quả
+  const [timeRemaining, setTimeRemaining] = useState(25); // thời gian trả lời câu hỏi
+  const [timerRunning, setTimerRunning] = useState(false); // xác định bố đếm chạy
 
   const { question, answers, correctAnswer } =
-    questions[activeQuestion];
+    questions[activeQuestion];// Lấy câu hỏi, câu trả lời, từ câu hỏi hiện tại
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -39,7 +39,7 @@ const Quiz = ({ questions, userId }: QuizProps) => {
       handleTimeUp();
     }
     return () => clearTimeout(timer);
-  }, [timerRunning, timeRemaining]);
+  }, [timerRunning, timeRemaining]); // Hook useEffect quản lý bộ đếm thời gian
 
   const startTimer = () => {
     setTimerRunning(true);
@@ -78,7 +78,7 @@ const Quiz = ({ questions, userId }: QuizProps) => {
     } else {
       setSelectedAnswer("");
     }
-  };
+  }; // Sau khi người dùng chọn đáp án, nếu đúng => lưu lại, còn k đặt là selectAnsw
 
   const nextQuestion = () => {
     setSelectedAnswerIndex(null);
@@ -135,7 +135,7 @@ const Quiz = ({ questions, userId }: QuizProps) => {
     setChecked(false);
     resetTimer();
     startTimer();
-  };
+  }; // Chuyển sang câu hỏi tiếp theo, cập nhật điểm, số câu trả lời, nếu là câu cuối thì trả kết quả
   return (
     <div className="min-h-[500px]">
       <div className="max-w-[1500px] mx-auto w-[90%] flex justify-center py-10 flex-col">
@@ -226,7 +226,7 @@ const Quiz = ({ questions, userId }: QuizProps) => {
         )}
       </div>
     </div>
-  );
+  ); // Phần trả về của component, hiển thị câu hỏi, thời gian, các lựa chọn 
 };
 
 export default Quiz;

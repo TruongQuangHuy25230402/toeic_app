@@ -1,4 +1,4 @@
-export const quiz = {
+ export const quiz = {
     totalQuestions: 20,
     questions: [
       {
@@ -123,3 +123,5 @@ export const quiz = {
       },
     ],
   };
+
+ 

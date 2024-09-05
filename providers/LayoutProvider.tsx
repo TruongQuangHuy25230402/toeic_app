@@ -5,8 +5,8 @@ import { fetchUsers } from "../app/(auth)/actions/fetchUsers";
 import { useEffect } from "react";
 import Navbar from "@/components/layout/nav/Navbar";
 import Footer from "@/components/layout/footer/Footer";
-import Container from "@/components/Container";
 import SideNavbar from "@/components/SideNavbar";
+import Container from "@/components/Container"; // Giả sử bạn có một container riêng cho layout
 
 function LayoutProvider({
   children,
@@ -14,22 +14,49 @@ function LayoutProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isPublicRoute = ["sign-in", "sign-up"].includes(
-    pathname.split("/")[1]
-  );
 
+  // Xác định nếu là đường dẫn công cộng
+  const isPublicRoute = ["sign-in", "sign-up"].includes(pathname.split("/")[1]);
+
+  // Xác định nếu là đường dẫn admin
   const isAdminRoute = pathname.startsWith("/admin");
+
+  // Xác định nếu là đường dẫn exam
+  const isExamRoute = pathname.startsWith("/exam");
+
+  // Xác định nếu là trang chủ
+  const isHomePage = pathname === "/";
 
   // Bỏ qua LayoutProvider nếu là trang Admin
   if (isAdminRoute) {
-    return <div className='min-h-screen w-full bg-white text-black flex'>
-    <SideNavbar/>
-    <div className="p-8 w-full">{children}</div>
-  </div>; // Hoặc render một layout trống hoặc nội dung khác nếu cần
+    return (
+      <div className='min-h-screen w-full bg-white text-black flex'>
+        <SideNavbar />
+        <div className="p-8 w-full">{children}</div>
+      </div>
+    );
   }
 
+  // Layout riêng cho trang /exam
+  if (isExamRoute) {
+    return (
+      <div className="min-h-screen w-full flex flex-col bg-exam-background">
+        <header className="w-full">
+          {/* Nếu cần có header riêng cho trang exam */}
+        </header>
+        <main className="flex-grow w-full p-4">
+          {children}
+        </main>
+        <footer className="w-full">
+          {/* Nếu cần có footer riêng cho trang exam */}
+        </footer>
+      </div>
+    );
+  }
+
+  // Hàm lấy Navbar
   const getNavbar = () => {
-    if (isPublicRoute) return null;
+    if (isPublicRoute || isAdminRoute || isExamRoute) return null;
     return (
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navbar />
@@ -37,15 +64,18 @@ function LayoutProvider({
     );
   };
 
+  // Hàm lấy Footer
   const getFooter = () => {
-    if (isPublicRoute) return null;
+    if (isPublicRoute || isAdminRoute || isExamRoute) return null;
     return <Footer />;
   };
 
+  // Hàm lấy nội dung chính
   const getContent = () => {
     return <>{children}</>;
   };
 
+  // Hàm lấy thông tin người dùng
   const getCurrentUser = async () => {
     try {
       const response: any = await fetchUsers();
@@ -59,14 +89,13 @@ function LayoutProvider({
   };
 
   useEffect(() => {
-    if (!isPublicRoute) getCurrentUser();
-  }, []);
+    if (!isPublicRoute && !isAdminRoute && !isExamRoute) getCurrentUser();
+  }, [pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
+    <div className={`min-h-screen flex flex-col w-full ${isHomePage ? 'bg-home-background' : 'bg-default-background'}`}>
       {getNavbar()}
-      {/* Ensure there is padding to push content below the fixed Navbar */}
-      <main className={`flex-grow ${!isPublicRoute ? 'pt-16' : ''}`}>
+      <main className={`flex-grow  ${!isPublicRoute ? 'pt-16 pb-16' : 'pb-16'} px-4`}>
         {getContent()}
       </main>
       {getFooter()}
@@ -75,4 +104,3 @@ function LayoutProvider({
 }
 
 export default LayoutProvider;
-
