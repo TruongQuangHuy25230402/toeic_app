@@ -61,7 +61,7 @@ import AddPart6 from "../part6/AddPart6";
 import AddPart7 from "../part7/AddPart7";
 import ArrayPart1 from "../part1/ArrayPart1";
 import BulkUpload from "./bulk-upload";
-import { getPart1s } from "@/app/api/part1/route";
+
 
 
 interface AddExamFormProps {
