@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation"; // Import necessary ho
 import { QuestionPart5 } from "@prisma/client";
 import apiClient from "@/lib/api-client";
 import { USER_API_ROUTES } from "@/ultis/api-route";
-import TablePart5 from "./tablePart5";
 import axios from "axios";
 
 const Part5 = ({ part5s }: { part5s: Part5Props[] }) => {
