@@ -154,13 +154,13 @@ const PartialTestComponent = ({
     const score = totalListeningScore + totalReadingScore;
   
    // try {
-      await fetch("/api/userAnswers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userAnswers }),
-      });
+     // await fetch("/api/userAnswers", {
+       // method: "POST",
+       // headers: {
+       //   "Content-Type": "application/json",
+      //  },
+       // body: JSON.stringify({ userAnswers }),
+      //});
     //} catch (error) {
     //  console.error("Error saving user answers:", error);
     //}
