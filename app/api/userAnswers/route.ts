@@ -18,13 +18,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           selectedAnswer: answer.selectedAnswer || "", // Đảm bảo không undefined
           isCorrect: answer.isCorrect || false, // Đảm bảo không undefined
           isSkipped: answer.isSkipped || false, // Đảm bảo không undefined
-          questionPart1Id: answer.questionPart1Id || null,
-          questionPart2Id: answer.questionPart2Id || null,
-          questionPart3Id: answer.questionPart3Id || null,
-          questionPart4Id: answer.questionPart4Id || null,
-          questionPart5Id: answer.questionPart5Id || null,
-          questionPart6Id: answer.questionPart6Id || null,
-          questionPart7Id: answer.questionPart7Id || null,
+          questionPart1Id: answer.part1sId || null,
+          questionPart2Id: answer.part2sId || null,
+          questionPart3Id: answer.part3sId || null,
+          questionPart4Id: answer.part4sId || null,
+          questionPart5Id: answer.part5sId || null,
+          questionPart6Id: answer.part6sId || null,
+          questionPart7Id: answer.part7sId || null,
         };
       });
 

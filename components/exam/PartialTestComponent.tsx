@@ -153,7 +153,7 @@ const PartialTestComponent = ({
     // Tính điểm tổng
     const score = totalListeningScore + totalReadingScore;
   
-    try {
+   // try {
       await fetch("/api/userAnswers", {
         method: "POST",
         headers: {
@@ -161,9 +161,9 @@ const PartialTestComponent = ({
         },
         body: JSON.stringify({ userAnswers }),
       });
-    } catch (error) {
-      console.error("Error saving user answers:", error);
-    }
+    //} catch (error) {
+    //  console.error("Error saving user answers:", error);
+    //}
   
     setCorrectAnswersCount(correctCount);
     setSkippedAnswersCount(skippedCount);
