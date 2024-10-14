@@ -11,7 +11,7 @@ interface ExamPageProps {
 
 const Exam = async({params} : ExamPageProps) => {
     const exam = await getExamById(params.examId); // tại actions getExamById.ts
-    const part5s = await getPart5();
+    const part5s = await getPart5(params.examId);
   return (
     <div>
       <AddToeicExamForm exam={exam} part5={part5s || []} />
