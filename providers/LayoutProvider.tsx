@@ -15,14 +15,14 @@ function LayoutProvider({
 }) {
   const pathname = usePathname();
 
-  // Xác định nếu là đường dẫn công cộng
-  const isPublicRoute = ["sign-in", "sign-up"].includes(pathname.split("/")[1]);
-
   // Xác định nếu là đường dẫn admin
   const isAdminRoute = pathname.startsWith("/admin");
 
   // Xác định nếu là đường dẫn exam
   const isExamRoute = pathname.startsWith("/exam");
+
+  // Xác định nếu là đường dẫn exam
+  const isUploadRoute = pathname.startsWith("/upload");
 
   // Xác định nếu là trang chủ
   const isHomePage = pathname === "/";
@@ -54,9 +54,9 @@ function LayoutProvider({
     );
   }
 
-  // Hàm lấy Navbar
+  // Hàm lấy Navbar - chỉ bỏ qua /admin và /exam
   const getNavbar = () => {
-    if (isPublicRoute || isAdminRoute || isExamRoute) return null;
+    if (isAdminRoute || isExamRoute || isUploadRoute) return null;
     return (
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navbar />
@@ -64,9 +64,9 @@ function LayoutProvider({
     );
   };
 
-  // Hàm lấy Footer
+  // Hàm lấy Footer - chỉ bỏ qua /admin và /exam
   const getFooter = () => {
-    if (isPublicRoute || isAdminRoute || isExamRoute) return null;
+    if (isAdminRoute || isExamRoute || isUploadRoute) return null;
     return <Footer />;
   };
 
@@ -79,8 +79,7 @@ function LayoutProvider({
   const getCurrentUser = async () => {
     try {
       const response: any = await fetchUsers();
-      if (response.error)
-        throw new Error(response.error.message);
+      if (response.error) throw new Error(response.error.message);
     } catch (error) {
       console.log(error);
     } finally {
@@ -89,13 +88,13 @@ function LayoutProvider({
   };
 
   useEffect(() => {
-    if (!isPublicRoute && !isAdminRoute && !isExamRoute) getCurrentUser();
+    if (!isAdminRoute && !isExamRoute) getCurrentUser();
   }, [pathname]);
 
   return (
     <div className={`min-h-screen flex flex-col w-full ${isHomePage ? 'bg-home-background' : 'bg-default-background'}`}>
       {getNavbar()}
-      <main className={`flex-grow  ${!isPublicRoute ? 'pt-16 pb-16' : 'pb-16'} px-4`}>
+      <main className={`flex-grow ${!isAdminRoute && !isExamRoute ? 'pt-16 pb-16' : 'pb-16'} px-4`}>
         {getContent()}
       </main>
       {getFooter()}

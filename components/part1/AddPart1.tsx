@@ -1,6 +1,6 @@
 "use client";
 
-import { Exam, QuestionPart1 } from "@prisma/client";
+import { Exam, QuestionPart1, TopicPart1 } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { Form, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,15 +16,23 @@ import {
 import { Input } from "../ui/input";
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { Loader2, Pencil, PencilLine, XCircle } from "lucide-react";
+import { Loader2, Pencil, PencilLine, Trash, XCircle } from "lucide-react";
 import { UploadButton } from "../uploadthing";
-import { toast } from "../ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import "react-quill/dist/quill.snow.css"; // Import stylesheet
 import dynamic from "next/dynamic";
 import { Separator } from "../ui/separator";
-import BulkUpload from "../exam/bulk-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import apiClient from "@/lib/api-client";
+import { USER_API_ROUTES } from "@/ultis/api-route";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 type PartType =
@@ -42,6 +50,7 @@ interface AddPart1FormProps {
   };
   part1?: QuestionPart1;
   handleDialogueOpen: (part: PartType) => void;
+  topics: TopicPart1[];
 }
 
 const formSchema = z.object({
@@ -51,6 +60,7 @@ const formSchema = z.object({
   answer2: z.string().min(1, { message: "must be atleast 1 characters long." }),
   answer3: z.string().min(1, { message: "must be atleast 1 characters long." }),
   answer4: z.string().min(1, { message: "must be atleast 1 characters long." }),
+  topicId: z.string().nullable(), // Change this to a single string
   correctAnswer: z
     .string()
     .min(1, { message: "must be atleast 1 characters long." }), // Đáp án đúng
@@ -70,6 +80,8 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [topics, setTopics] = useState<TopicPart1[]>([]);
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -77,14 +89,31 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
     defaultValues: part1 || {
       audioFile: "",
       imageFile: "",
-      answer1: "",
-      answer2: "",
-      answer3: "",
-      answer4: "",
+      answer1: "A",
+      answer2: "B",
+      answer3: "C",
+      answer4: "D",
       correctAnswer: "", // Đáp án đúng
       explainAnswer: "",
+      topicId: "",
     },
   });
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await apiClient.get(USER_API_ROUTES.GET_TOPICS_PART1);
+
+        if (response.data.topics) {
+          setTopics(response.data.topics); // Correctly set the topics array
+        }
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, []);
 
   useEffect(() => {
     if (typeof image === "string") {
@@ -165,6 +194,41 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
     handleDialogueOpen("part1");
   };
 
+  const handleQuestionDelete = (part1: QuestionPart1) => {
+    setIsLoading(true);
+    const imageKey = part1.imageFile.substring(part1.imageFile.lastIndexOf("/" + 1));
+
+    axios
+      .post("/api/uploadthing/delete", { imageKey })
+      .then(() => {
+        axios
+          .delete(`/api/part1/${part1.id}`)
+          .then(() => {
+            router.refresh();
+            toast({
+              variant: "default",
+              description: "Question Delete!",
+            });
+            setIsLoading(false);
+          })
+          .catch(() => {
+            setIsLoading(false);
+            toast({
+              variant: "destructive",
+              description: "Something went wrong!",
+            });
+          });
+      })
+      .catch(() => {
+        setIsLoading(false);
+        toast({
+          variant: "destructive",
+          description: "Something went wrong!",
+        });
+      });
+  };
+
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     if (exam && part1) {
@@ -209,12 +273,12 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
           });
           setIsLoading(false);
         });
-      }}
+    }
+  }
   return (
     <div className="max-h-[75vh] overflow-y-auto px-2">
       <Form {...form}>
         <form className="space-y-6">
-
           <FormField
             control={form.control}
             name="imageFile"
@@ -338,6 +402,35 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
 
           <FormField
             control={form.control}
+            name="topicId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Topic *</FormLabel>
+                <FormDescription>
+                  Please select the topic related to your content
+                </FormDescription>
+                <Select
+                  disabled={isLoading}
+                  onValueChange={(value) => field.onChange(value)} // Handle value change
+                  value={field.value ?? ""} // Single string value
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select a Topic" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {topics.map((topic) => (
+                      <SelectItem key={topic.id} value={topic.id}>
+                        {topic.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="answer1"
             render={({ field }) => (
               <FormItem>
@@ -437,30 +530,10 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
               </FormItem>
             )}
           />
-          
-          
-        <Separator/>
-          <div className="pt-4 pb-2">
+
+          <Separator />
+          <div className="pt-4 pb-2 flex gap-2">
             {part1 ? (
-              <Button
-                onClick={form.handleSubmit(onSubmit)}
-                type="button"
-                className="max-w-[150px]"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4" />
-                    Updating
-                  </>
-                ) : (
-                  <>
-                    <PencilLine className="mr-2 h-4 w-4" />
-                    Update
-                  </>
-                )}
-              </Button>
-            ) : (
               <>
                 <Button
                   onClick={form.handleSubmit(onSubmit)}
@@ -471,25 +544,45 @@ const AddPart1 = ({ exam, part1, handleDialogueOpen }: AddPart1FormProps) => {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4" />
-                      Creating
+                      Updating
                     </>
                   ) : (
                     <>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Create Question
+                      <PencilLine className="mr-2 h-4 w-4" />
+                      Update
                     </>
                   )}
-
-
+                </Button>
+                <Button
+                  onClick={() => handleQuestionDelete(part1)}
+                  type="button"
+                  className="max-w-[150px] bg-red-500 hover:bg-red-600"
+                  disabled={isLoading}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
                 </Button>
               </>
+            ) : (
+              <Button
+                onClick={form.handleSubmit(onSubmit)}
+                type="button"
+                className="max-w-[150px]"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4" />
+                    Creating
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Create Question
+                  </>
+                )}
+              </Button>
             )}
-          <div className="mt-2">
-            <Separator />
-         
-          </div>
-          
-          
           </div>
         </form>
       </Form>

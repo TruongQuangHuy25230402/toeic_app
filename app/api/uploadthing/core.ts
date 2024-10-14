@@ -6,7 +6,7 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   // Uploader for images
-  imageUploader: f({ image: { maxFileSize: "8MB", maxFileCount: 1 } })
+  imageUploader: f({ image: { maxFileSize: "8MB", maxFileCount: 10 } })
     .middleware(async ({ req }) => {
       const { userId } = auth();
 
@@ -20,7 +20,7 @@ export const ourFileRouter = {
     }),
 
   // Uploader for audio files
-  audioUploader: f({ audio: { maxFileSize: "64MB", maxFileCount: 1 } })
+  audioUploader: f({ audio: { maxFileSize: "64MB", maxFileCount: 30 } })
     .middleware(async ({ req }) => {
       const { userId } = auth();
 

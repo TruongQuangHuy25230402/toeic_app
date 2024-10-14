@@ -6,11 +6,9 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { UserButton, useAuth } from "@clerk/nextjs";
-
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,8 +16,7 @@ import { usePathname, useRouter } from "next/navigation";
 const ActionButton = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { userId } = useAuth();
-  const { signOut } = useAuth();
+  const { isSignedIn, userId, signOut } = useAuth(); // Lấy thông tin người dùng
 
   const handleLogout = async () => {
     try {
@@ -28,6 +25,7 @@ const ActionButton = () => {
       console.error("Error signing out:", error);
     }
   };
+
   return (
     <div>
       <div className="md:hidden">
@@ -39,8 +37,10 @@ const ActionButton = () => {
             <SheetHeader>
               <SheetDescription>
                 <div className="flex flex-col space-y-4 items-start w-full text-lg text black mt-10">
-                  <UserButton afterSignOutUrl="/" />
-                  {!userId && (
+                  {/* Chỉ hiển thị UserButton nếu đã đăng nhập */}
+                  {isSignedIn && <UserButton afterSignOutUrl="/" />}
+                  
+                  {!isSignedIn && (
                     <>
                       <Button
                         onClick={() => router.push("/sign-in")}
@@ -50,63 +50,49 @@ const ActionButton = () => {
                         Sign in
                       </Button>
 
-                      <Button onClick={() => router.push("/sign-up")} size="sm">
-                        Sign up{" "}
+                      <Button
+                        onClick={() => router.push("/sign-up")}
+                        size="sm"
+                      >
+                        Sign up
                       </Button>
                     </>
                   )}
-                   <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Get started</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Chương trình học</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Đề thi online</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Flashcards</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Khóa học</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Blog</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Hỗ trợ</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Liên hệ</Link>
-                  <Link
-    href="/"
-    className="hover:border-4 hover:border-blue-500 hover:bg-blue-100 hover:shadow-lg hover:scale-105 transition-all duration-300 p-2 rounded-lg"
-  >Thông tin</Link>
-                  <Link href="/" onClick={handleLogout}>
-                    Log Out
-                  </Link>
+                  
+                  {/* Các liên kết không yêu cầu xác thực */}
+                  <Link href="/" className="link-class">Get started</Link>
+                  <Link href="/" className="link-class">Chương trình học</Link>
+                  <Link href="/" className="link-class">Đề thi online</Link>
+                  <Link href="/" className="link-class">Flashcards</Link>
+                  <Link href="/" className="link-class">Khóa học</Link>
+                  <Link href="/" className="link-class">Blog</Link>
+                  <Link href="/" className="link-class">Hỗ trợ</Link>
+                  <Link href="/" className="link-class">Liên hệ</Link>
+                  <Link href="/" className="link-class">Thông tin</Link>
+                  
+                  {/* Nút logout chỉ hiển thị nếu người dùng đã đăng nhập */}
+                  {isSignedIn && (
+                    <Link href="/" onClick={handleLogout}>
+                      Log Out
+                    </Link>
+                  )}
                 </div>
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
         </Sheet>
       </div>
+
       <div className="hidden md:flex md:space-x-4">
         <div className="flex items-center space-x-4">
           <ModeToggle />
           <Action />
         </div>
-        <UserButton afterSignOutUrl="/" />
-        {!userId && (
+
+        {/* Chỉ hiển thị UserButton nếu đã đăng nhập */}
+        {isSignedIn && <UserButton afterSignOutUrl="/" />}
+        
+        {!isSignedIn && (
           <>
             <Button
               onClick={() => router.push("/sign-in")}
@@ -117,7 +103,7 @@ const ActionButton = () => {
             </Button>
 
             <Button onClick={() => router.push("/sign-up")} size="sm">
-              Sign up{" "}
+              Sign up
             </Button>
           </>
         )}
