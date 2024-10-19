@@ -71,12 +71,13 @@ import ArrayPart7 from "../part7/ArrayPart7";
 import { UploadButton } from "../uploadthing";
 import UploadFile from "../upload/UploadFile";
 import { Part5Props } from "@/actions/getPart5";
-import Part1 from "../upload/Part1";
+import { Part1Props } from "@/actions/getPart1";
 
 
 interface AddExamFormProps {
   exam: ExamWithParts | null;
   part5: Part5Props[];
+  part1: Part1Props[];
 }
 
 export type ExamWithParts = Exam & {
@@ -99,7 +100,7 @@ const formSchema = z.object({
   audioFile: z.string().min(1, { message: "Audio is required" }),
 });
 
-const AddToeicExamForm = ({ exam, part5 }: AddExamFormProps) => {
+const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isExamDeleting, setIsExamDeleting] = useState(false);
@@ -844,7 +845,7 @@ const AddToeicExamForm = ({ exam, part5 }: AddExamFormProps) => {
           </div>
           {selectedTab === "answers" && (
                 <div>
-                  <UploadFile part5ss={part5} />
+                  <UploadFile part5ss={part5} part1ss={part1} />
                 </div>
               )}
         </form>

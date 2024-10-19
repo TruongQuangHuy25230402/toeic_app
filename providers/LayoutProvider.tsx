@@ -94,7 +94,8 @@ function LayoutProvider({
   return (
     <div className={`min-h-screen flex flex-col w-full ${isHomePage ? 'bg-home-background' : 'bg-default-background'}`}>
       {getNavbar()}
-      <main className={`flex-grow ${!isAdminRoute && !isExamRoute ? 'pt-16 pb-16' : 'pb-16'} px-4`}>
+      <main className={`flex-grow ${!isAdminRoute && !isExamRoute ? 'pt-16 pb-16' : 'pb-16'} px-4`}
+      style={{ minHeight: 'calc(100vh - 64px - 64px)' }}>
         {getContent()}
       </main>
       {getFooter()}

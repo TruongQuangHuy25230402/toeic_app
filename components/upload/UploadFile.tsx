@@ -1,11 +1,17 @@
-"use client"
+"use client";
 import React, { useState } from 'react';
 import Part5 from './Part5';
 import { Part5Props } from '@/actions/getPart5';
 import Part1 from './Part1';
 import Part2 from './Part2';
+import { Part1Props } from '@/actions/getPart1';
 
-const UploadFile = ({ part5ss }: { part5ss: Part5Props[] }) => {
+interface UploadFileProps {
+  part5ss: Part5Props[];
+  part1ss: Part1Props[]; // Add this line to define part1ss in the interface
+}
+
+const UploadFile: React.FC<UploadFileProps> = ({ part5ss, part1ss }) => { // Destructure both props in a single parameter
   const [selectedPart, setSelectedPart] = useState(1); // Default selected part is Part 1
 
   const handleTabChange = (partNumber: number) => {
@@ -31,11 +37,11 @@ const UploadFile = ({ part5ss }: { part5ss: Part5Props[] }) => {
 
       {/* Content based on selected part */}
       <div>
-        {selectedPart === 1 && <p><Part1 /></p>}
-        {selectedPart === 2 && <p><Part2  /></p>}
+        {selectedPart === 1 && <Part1 part1s={part1ss || []} />}
+        {selectedPart === 2 && <Part2 />}
         {selectedPart === 3 && <p>This is Part 3 content</p>}
         {selectedPart === 4 && <p>This is Part 4 content</p>}
-        {selectedPart === 5 && <p>This is Part 5 content <Part5 part5s={part5ss || []} /></p>}
+        {selectedPart === 5 && <Part5 part5s={part5ss || []} />}
         {selectedPart === 6 && <p>This is Part 6 content</p>}
         {selectedPart === 7 && <p>This is Part 7 content</p>}
       </div>

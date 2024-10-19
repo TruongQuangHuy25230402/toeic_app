@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { usePathname, useRouter } from "next/navigation"; // Import necessary hooks
 import { QuestionPart5 } from "@prisma/client";
-import apiClient from "@/lib/api-client";
-import { USER_API_ROUTES } from "@/ultis/api-route";
 import axios from "axios";
 
 const Part5 = ({ part5s }: { part5s: Part5Props[] }) => {
@@ -99,109 +97,115 @@ const Part5 = ({ part5s }: { part5s: Part5Props[] }) => {
 
   return (
     <div className="py-8 space-y-8">
-      <div className="flex items-center gap-8">
-        <div>
-          <label
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            htmlFor="file_input"
-          >
-            Upload file
-          </label>
-          <input
-            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-            id="file_input"
-            type="file"
-            accept=".xls,.xlsx"
-            onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-          />
-        </div>
-        <button
-          onClick={previewData}
-          className="py-2 px-6 rounded bg-slate-300 text-slate-900"
-        >
-          Preview Data
-        </button>
-        <button
-          onClick={saveData}
-          className="py-2 px-6 rounded bg-purple-600 text-slate-100"
-          disabled={loading}
-        >
-          {loading ? "Saving..." : "Save Data"}
-        </button>
-        <button
-          onClick={clearData}
-          className="py-2 px-6 rounded bg-red-600 text-slate-100"
-        >
-          Clear Data
-        </button>
-      </div>
-      <pre>{jsonData}</pre>
-
-      {loading ? (
-        <p>Saving Data please wait...</p>
-      ) : (
+      {/* Kiểm tra xem đã có câu hỏi hay chưa */}
+      {arrPart5.length > 0 ? (
+        
+        // Nếu đã có câu hỏi, hiển thị bảng câu hỏi
         <div className="relative overflow-x-auto">
-          {arrPart5 && arrPart5.length > 0 && (
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Question
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Answer 1
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Answer 2
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Answer 3
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Answer 4
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Correct
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Explanation
-                  </th>
-                  
+          <div>
+            <button
+              onClick={clearData}
+              className="py-2 px-6 rounded bg-red-600 text-slate-100"
+            >
+              Clear Data
+            </button>
+          </div>
+          
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Question
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Answer 1
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Answer 2
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Answer 3
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Answer 4
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Correct
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Explanation
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {arrPart5.map((part5) => (
+                <tr
+                  key={part5.id}
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <div
+                      className="truncate max-w-xs"
+                      title={part5.questionText}
+                    >
+                      {part5.questionText}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">{part5.answer1}</td>
+                  <td className="px-6 py-4">{part5.answer2}</td>
+                  <td className="px-6 py-4">{part5.answer3}</td>
+                  <td className="px-6 py-4">{part5.answer4}</td>
+                  <td className="px-6 py-4">{part5.correctAnswer}</td>
+                  <td className="px-6 py-4">
+                    <div
+                      className="truncate max-w-xs"
+                      title={part5.explainAnswer}
+                    >
+                      {part5.explainAnswer}
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {arrPart5.map((part5) => (
-                  <tr
-                    key={part5.id}
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                  >
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      <div
-                        className="truncate max-w-xs"
-                        title={part5.questionText}
-                      >
-                        {part5.questionText}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">{part5.answer1}</td>
-                    <td className="px-6 py-4">{part5.answer2}</td>
-                    <td className="px-6 py-4">{part5.answer3}</td>
-                    <td className="px-6 py-4">{part5.answer4}</td>
-                    <td className="px-6 py-4">{part5.correctAnswer}</td>
-                    <td className="px-6 py-4">
-                      <div
-                        className="truncate max-w-xs"
-                        title={part5.explainAnswer}
-                      >
-                        {part5.explainAnswer}
-                      </div>
-                    </td>
-                    {/* Remove Topic ID column if not used */}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        // Nếu chưa có câu hỏi, hiển thị phần upload file
+        <div>
+          <div className="flex items-center gap-8">
+            <div>
+              <label
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                htmlFor="file_input"
+              >
+                Upload file
+              </label>
+              <input
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                id="file_input"
+                type="file"
+                accept=".xls,.xlsx"
+                onChange={(e) =>
+                  setFile(e.target.files ? e.target.files[0] : null)
+                }
+              />
+            </div>
+            <button
+              onClick={previewData}
+              className="py-2 px-6 rounded bg-slate-300 text-slate-900"
+            >
+              Preview Data
+            </button>
+            <button
+              onClick={saveData}
+              className="py-2 px-6 rounded bg-purple-600 text-slate-100"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save Data"}
+            </button>
+            
+          </div>
+          <pre>{jsonData}</pre>
         </div>
       )}
     </div>
