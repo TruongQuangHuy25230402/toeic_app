@@ -86,11 +86,11 @@ export default function DictionaryPopup() {
   return (
     <div>
       <button
-        onClick={togglePopup}
-        className="fixed bottom-10 right-10 p-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition duration-300"
-      >
-        <FaBook className="w-6 h-6" />
-      </button>
+    onClick={togglePopup}
+    className="p-3 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition duration-300"
+  >
+    <FaBook className="w-6 h-6" />
+  </button>
 
       {isOpen && (
         <div

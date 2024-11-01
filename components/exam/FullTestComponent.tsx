@@ -551,21 +551,23 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
         </div>
 
         <div className="fixed bottom-10 right-10 flex flex-col items-center">
-          {/* DictionaryPopup luôn hiển thị */}
-          <div className="mb-2">
-            <DictionaryPopup />
-          </div>
+    {/* DictionaryPopup luôn hiển thị */}
+    <div className="max-h-48 overflow-y-auto z-20">
+      <DictionaryPopup />
+    </div>
 
-          {/* Nút cuộn lên chỉ hiển thị khi người dùng không ở đầu trang */}
-          {!isAtTop && (
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="p-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
-            >
-              <FaArrowUp className="w-6 h-6" />
-            </button>
-          )}
-        </div>
+    {/* Nút cuộn lên chỉ hiển thị khi người dùng không ở đầu trang */}
+    {!isAtTop && (
+      <div className="mt-2">
+        <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
+    >
+      <FaArrowUp className="w-6 h-6" />
+    </button>
+      </div>
+    )}
+  </div>
       </div>
     </div>
   );
