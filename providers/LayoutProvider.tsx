@@ -24,6 +24,10 @@ function LayoutProvider({
   // Xác định nếu là đường dẫn exam
   const isUploadRoute = pathname.startsWith("/upload");
 
+  const isLMSRoute = pathname.startsWith("/lms");
+
+  const isCourseRoute = pathname.startsWith("/course");
+
   // Xác định nếu là trang chủ
   const isHomePage = pathname === "/";
 
@@ -66,7 +70,7 @@ function LayoutProvider({
 
   // Hàm lấy Footer - chỉ bỏ qua /admin và /exam
   const getFooter = () => {
-    if (isAdminRoute || isExamRoute || isUploadRoute) return null;
+    if (isAdminRoute || isExamRoute || isUploadRoute || isLMSRoute || isCourseRoute) return null;
     return <Footer />;
   };
 
