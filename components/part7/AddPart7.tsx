@@ -1,6 +1,6 @@
 "use client";
 
-import { Exam, QuestionPart7 } from "@prisma/client";
+import { Exam, QuestionPart7, TopicPart7 } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { Form, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -24,6 +24,16 @@ import { useRouter } from "next/navigation";
 import "react-quill/dist/quill.snow.css"; // Import stylesheet
 import dynamic from "next/dynamic";
 import { Separator } from "../ui/separator";
+import apiClient from "@/lib/api-client";
+import { USER_API_ROUTES } from "@/ultis/api-route";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -42,14 +52,18 @@ interface AddPart7FormProps {
   };
   part7?: QuestionPart7;
   handleDialogueOpen: (part: PartType) => void;
+  topics: TopicPart7[];
 }
 
 const formSchema = z.object({
   imageFile: z.string().optional(), // cho phép trường này trống
+  imageFile2: z.string().nullable(), // cho phép trường này trống
+  imageFile3: z.string().nullable(), // cho phép trường này trống
   answer1: z.string().min(1, { message: "must be atleast 7 characters long." }),
   answer2: z.string().min(1, { message: "must be atleast 7 characters long." }),
   answer3: z.string().min(1, { message: "must be atleast 7 characters long." }),
   answer4: z.string().min(1, { message: "must be atleast 7 characters long." }),
+  topicId: z.string().nullable(),
   correctAnswer: z
     .string()
     .min(1, { message: "must be atleast 7 characters long." }), // Đáp án đúng
@@ -61,7 +75,19 @@ const formSchema = z.object({
 const AddPart7 = ({ exam, part7, handleDialogueOpen }: AddPart7FormProps) => {
   const [image, setImage] = useState<string | undefined>(part7?.imageFile);
 
+  const [image2, setImage2] = useState<string | undefined>(part7?.imageFile2 as string | undefined);
+
+
+  const [image3, setImage3] = useState<string | undefined>(part7?.imageFile3 as string | undefined);
+
+
   const [imageIsDeleting, setImageIsDeleting] = useState(false);
+
+  const [imageIsDeleting2, setImageIsDeleting2] = useState(false);
+
+  const [imageIsDeleting3, setImageIsDeleting3] = useState(false);
+
+  const [topics, setTopics] = useState<TopicPart7[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,6 +103,9 @@ const AddPart7 = ({ exam, part7, handleDialogueOpen }: AddPart7FormProps) => {
       answer4: "D",
       correctAnswer: "", // Đáp án đúng
       explainAnswer: "",
+      topicId: "",
+      imageFile2: "",
+      imageFile3:"",
     },
   });
 
@@ -90,6 +119,22 @@ const AddPart7 = ({ exam, part7, handleDialogueOpen }: AddPart7FormProps) => {
     }
     //eslint-disable-next-line
   }, [image]);
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await apiClient.get(USER_API_ROUTES.GET_TOPICS_PART7);
+
+        if (response.data.topics) {
+          setTopics(response.data.topics); // Correctly set the topics array
+        }
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, []);
 
   
 
@@ -116,6 +161,58 @@ const AddPart7 = ({ exam, part7, handleDialogueOpen }: AddPart7FormProps) => {
       })
       .finally(() => {
         setImageIsDeleting(false);
+      });
+  };
+
+  const handleImageDelete2 = (image2: string) => {
+    setImageIsDeleting2(true);
+    const imageKey = image2.substring(image2.lastIndexOf("/") + 1);
+
+    axios
+      .post("/api/uploadthing/delete", { imageKey })
+      .then((res) => {
+        if (res.data.success) {
+          setImage2("");
+          toast({
+            variant: "default",
+            description: "Image removed",
+          });
+        }
+      })
+      .catch(() => {
+        toast({
+          variant: "destructive",
+          description: "Something went wrong",
+        });
+      })
+      .finally(() => {
+        setImageIsDeleting2(false);
+      });
+  };
+
+  const handleImageDelete3 = (image3: string) => {
+    setImageIsDeleting3(true);
+    const imageKey = image3.substring(image3.lastIndexOf("/") + 1);
+
+    axios
+      .post("/api/uploadthing/delete", { imageKey })
+      .then((res) => {
+        if (res.data.success) {
+          setImage3("");
+          toast({
+            variant: "default",
+            description: "Image removed",
+          });
+        }
+      })
+      .catch(() => {
+        toast({
+          variant: "destructive",
+          description: "Something went wrong",
+        });
+      })
+      .finally(() => {
+        setImageIsDeleting3(false);
       });
   };
 
@@ -238,6 +335,130 @@ const AddPart7 = ({ exam, part7, handleDialogueOpen }: AddPart7FormProps) => {
             )}
           />
 
+<FormField
+            control={form.control}
+            name="imageFile2"
+            render={({ field }) => (
+              <FormItem className="flex flex-col space-y-3">
+                <FormLabel>Upload an Image 2</FormLabel>
+                <FormDescription>
+                  Choose an image that will show-case your Exam nicely
+                </FormDescription>
+                <FormControl>
+                  {image2 ? (
+                    <>
+                      <div className="relative max-w-[700px] min-w-[200px] max-h-[700px] min-h-[200px] mt-7">
+                        <Image
+                          fill
+                          src={image2}
+                          alt="Exam Image"
+                          className="object-contain"
+                        />
+                        <Button
+                          onClick={() => handleImageDelete2(image2)}
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="absolute right-[-12px] top-0"
+                        >
+                          {imageIsDeleting2 ? <Loader2 /> : <XCircle />}
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className="flex flex-col items-center max-w-[7000px] p-12 border-2 border-dashed
+                          border-primary/50 rounded mt-7"
+                      >
+                        <UploadButton
+                          endpoint="imageUploader"
+                          onClientUploadComplete={(res) => {
+                            console.log("Files: ", res);
+                            setImage2(res[0].url);
+                            form.setValue("imageFile2",res[0].url)
+                            toast({
+                              variant: "default",
+                              description: "Upload Completed",
+                            });
+                          }}
+                          onUploadError={(error: Error) => {
+                            toast({
+                              variant: "destructive",
+                              description: `ERROR! ${error.message}`,
+                            });
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+<FormField
+            control={form.control}
+            name="imageFile3"
+            render={({ field }) => (
+              <FormItem className="flex flex-col space-y-3">
+                <FormLabel>Upload an Image</FormLabel>
+                <FormDescription>
+                  Choose an image that will show-case your Exam nicely
+                </FormDescription>
+                <FormControl>
+                  {image3 ? (
+                    <>
+                      <div className="relative max-w-[700px] min-w-[200px] max-h-[700px] min-h-[200px] mt-7">
+                        <Image
+                          fill
+                          src={image3}
+                          alt="Exam Image"
+                          className="object-contain"
+                        />
+                        <Button
+                          onClick={() => handleImageDelete3(image3)}
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="absolute right-[-12px] top-0"
+                        >
+                          {imageIsDeleting3 ? <Loader2 /> : <XCircle />}
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className="flex flex-col items-center max-w-[7000px] p-12 border-2 border-dashed
+                          border-primary/50 rounded mt-7"
+                      >
+                        <UploadButton
+                          endpoint="imageUploader"
+                          onClientUploadComplete={(res) => {
+                            console.log("Files: ", res);
+                            setImage3(res[0].url);
+                            form.setValue("imageFile3",res[0].url)
+                            toast({
+                              variant: "default",
+                              description: "Upload Completed",
+                            });
+                          }}
+                          onUploadError={(error: Error) => {
+                            toast({
+                              variant: "destructive",
+                              description: `ERROR! ${error.message}`,
+                            });
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
           
 
           <FormField
@@ -316,6 +537,35 @@ const AddPart7 = ({ exam, part7, handleDialogueOpen }: AddPart7FormProps) => {
                 </FormControl>
 
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+<FormField
+            control={form.control}
+            name="topicId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Topic *</FormLabel>
+                <FormDescription>
+                  Please select the topic related to your content
+                </FormDescription>
+                <Select
+                  disabled={isLoading}
+                  onValueChange={(value) => field.onChange(value)} // Handle value change
+                  value={field.value ?? ""} // Single string value
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select a Topic" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {topics.map((topic) => (
+                      <SelectItem key={topic.id} value={topic.id}>
+                        {topic.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />

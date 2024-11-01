@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import Navbar from "@/components/layout/nav/Navbar";
 import Footer from "@/components/layout/footer/Footer";
 import SideNavbar from "@/components/SideNavbar";
-import Container from "@/components/Container"; // Giả sử bạn có một container riêng cho layout
+
 
 function LayoutProvider({
   children,

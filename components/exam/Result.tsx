@@ -126,7 +126,7 @@ const [selectedPart, setSelectedPart] = useState<number | null>(null);
 </div>
 
       <div className="w-1/5 p-4  mr-4">
-        <UserInfo />
+       
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'; // Đây là phần thêm để chỉ đ
 
 export async function GET() {
   try {
-    const clerkUser = await currentUser();
+    const clerkUser = await currentUser(); 
 
     if (!clerkUser) {
       return new NextResponse('Unauthorized', { status: 401 });
@@ -24,9 +24,11 @@ export async function GET() {
     }
 
     // Return the user as JSON
-    return NextResponse.json({ user });
+    return NextResponse.json({ user, userId: user.id });
   } catch (error) {
     console.error('Error at /api/user/', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+
+

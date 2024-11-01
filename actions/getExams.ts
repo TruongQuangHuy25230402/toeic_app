@@ -14,6 +14,7 @@ export const getExams = async()=>{
                 part5s: true,
                 part6s: true,
                 part7s: true,
+                userAnswers: true
 
             }
         })

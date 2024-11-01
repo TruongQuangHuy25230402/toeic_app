@@ -1,6 +1,6 @@
 "use client";
 
-import { Exam, QuestionPart6 } from "@prisma/client";
+import { Exam, QuestionPart6, TopicPart6 } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { Form, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -24,6 +24,15 @@ import { useRouter } from "next/navigation";
 import "react-quill/dist/quill.snow.css"; // Import stylesheet
 import dynamic from "next/dynamic";
 import { Separator } from "../ui/separator";
+import apiClient from "@/lib/api-client";
+import { USER_API_ROUTES } from "@/ultis/api-route";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -42,6 +51,7 @@ interface AddPart6FormProps {
   };
   part6?: QuestionPart6;
   handleDialogueOpen: (part: PartType) => void;
+  topics: TopicPart6[];
 }
 
 const formSchema = z.object({
@@ -50,6 +60,7 @@ const formSchema = z.object({
   answer2: z.string().min(1, { message: "must be atleast 6 characters long." }),
   answer3: z.string().min(1, { message: "must be atleast 6 characters long." }),
   answer4: z.string().min(1, { message: "must be atleast 6 characters long." }),
+  topicId: z.string().nullable(),
   correctAnswer: z
     .string()
     .min(1, { message: "must be atleast 6 characters long." }), // Đáp án đúng
@@ -62,6 +73,8 @@ const AddPart6 = ({ exam, part6, handleDialogueOpen }: AddPart6FormProps) => {
   const [image, setImage] = useState<string | undefined>(part6?.imageFile);
 
   const [imageIsDeleting, setImageIsDeleting] = useState(false);
+
+  const [topics, setTopics] = useState<TopicPart6[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,6 +90,7 @@ const AddPart6 = ({ exam, part6, handleDialogueOpen }: AddPart6FormProps) => {
       answer4: "D",
       correctAnswer: "", // Đáp án đúng
       explainAnswer: "",
+      topicId: "",
     },
   });
 
@@ -117,6 +131,22 @@ const AddPart6 = ({ exam, part6, handleDialogueOpen }: AddPart6FormProps) => {
         setImageIsDeleting(false);
       });
   };
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await apiClient.get(USER_API_ROUTES.GET_TOPICS_PART6);
+
+        if (response.data.topics) {
+          setTopics(response.data.topics); // Correctly set the topics array
+        }
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, []);
 
 
 
@@ -299,6 +329,35 @@ const AddPart6 = ({ exam, part6, handleDialogueOpen }: AddPart6FormProps) => {
                 </FormControl>
 
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+<FormField
+            control={form.control}
+            name="topicId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Topic *</FormLabel>
+                <FormDescription>
+                  Please select the topic related to your content
+                </FormDescription>
+                <Select
+                  disabled={isLoading}
+                  onValueChange={(value) => field.onChange(value)} // Handle value change
+                  value={field.value ?? ""} // Single string value
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select a Topic" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {topics.map((topic) => (
+                      <SelectItem key={topic.id} value={topic.id}>
+                        {topic.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />

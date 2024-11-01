@@ -5,13 +5,27 @@ import { Part5Props } from '@/actions/getPart5';
 import Part1 from './Part1';
 import Part2 from './Part2';
 import { Part1Props } from '@/actions/getPart1';
+import { Part2Props } from '@/actions/getPart2';
+import { Part3Props } from '@/actions/getPart3';
+import { Part7Props } from '@/actions/getPart7';
+import { Part6Props } from '@/actions/getPart6';
+import { Part4Props } from '@/actions/getPart4';
+import Part3 from './Part3';
+import Part4 from './Part4';
+import Part6 from './Part6';
+import Part7 from './Part7';
 
 interface UploadFileProps {
   part5ss: Part5Props[];
   part1ss: Part1Props[]; // Add this line to define part1ss in the interface
+  part2ss: Part2Props[]; // Add this line to define part1ss in the interface
+  part3ss: Part3Props[]; // Add this line to define part1ss in the interface
+  part4ss: Part4Props[]; // Add this line to define part1ss in the interface
+  part7ss: Part7Props[]; // Add this line to define part1ss in the interface
+  part6ss: Part6Props[]; // Add this line to define part1ss in the interface
 }
 
-const UploadFile: React.FC<UploadFileProps> = ({ part5ss, part1ss }) => { // Destructure both props in a single parameter
+const UploadFile: React.FC<UploadFileProps> = ({ part5ss, part1ss, part2ss, part3ss, part4ss, part6ss,part7ss }) => { // Destructure both props in a single parameter
   const [selectedPart, setSelectedPart] = useState(1); // Default selected part is Part 1
 
   const handleTabChange = (partNumber: number) => {
@@ -38,12 +52,12 @@ const UploadFile: React.FC<UploadFileProps> = ({ part5ss, part1ss }) => { // Des
       {/* Content based on selected part */}
       <div>
         {selectedPart === 1 && <Part1 part1s={part1ss || []} />}
-        {selectedPart === 2 && <Part2 />}
-        {selectedPart === 3 && <p>This is Part 3 content</p>}
-        {selectedPart === 4 && <p>This is Part 4 content</p>}
+        {selectedPart === 2 && <Part2 part2s={part2ss || []} />}
+        {selectedPart === 3 && <Part3 part3s={part3ss || []} />}
+        {selectedPart === 4 && <Part4 part4s={part4ss || []} />}
         {selectedPart === 5 && <Part5 part5s={part5ss || []} />}
-        {selectedPart === 6 && <p>This is Part 6 content</p>}
-        {selectedPart === 7 && <p>This is Part 7 content</p>}
+        {selectedPart === 6 && <Part6 part6s={part6ss || []} />}
+        {selectedPart === 7 && <Part7 part7s={part7ss || []} />}
       </div>
     </div>
   );

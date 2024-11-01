@@ -14,6 +14,7 @@ import {
   QuestionPart6,
   QuestionPart7,
   TopicPart1,
+  UserAnswer,
 } from "@prisma/client";
 
 import { useToast } from "../ui/use-toast";
@@ -70,14 +71,24 @@ import ArrayPart6 from "../part6/ArrayPart6";
 import ArrayPart7 from "../part7/ArrayPart7";
 import { UploadButton } from "../uploadthing";
 import UploadFile from "../upload/UploadFile";
-import { Part5Props } from "@/actions/getPart5";
-import { Part1Props } from "@/actions/getPart1";
+import { Part1Props } from '@/actions/getPart1';
+import { Part2Props } from '@/actions/getPart2';
+import { Part3Props } from '@/actions/getPart3';
+import { Part7Props } from '@/actions/getPart7';
+import { Part6Props } from '@/actions/getPart6';
+import { Part4Props } from '@/actions/getPart4';
+import { Part5Props } from '@/actions/getPart5';
 
 
 interface AddExamFormProps {
   exam: ExamWithParts | null;
   part5: Part5Props[];
-  part1: Part1Props[];
+  part1: Part1Props[]; // Add this line to define part1ss in the interface
+  part2: Part2Props[]; // Add this line to define part1ss in the interface
+  part3: Part3Props[]; // Add this line to define part1ss in the interface
+  part4: Part4Props[]; // Add this line to define part1ss in the interface
+  part7: Part7Props[]; // Add this line to define part1ss in the interface
+  part6: Part6Props[]; // Add this line to define part1ss in the interface
 }
 
 export type ExamWithParts = Exam & {
@@ -88,6 +99,7 @@ export type ExamWithParts = Exam & {
   part5s: QuestionPart5[];
   part6s: QuestionPart6[];
   part7s: QuestionPart7[];
+  userAnswers?: UserAnswer[];
 };
 
 const formSchema = z.object({
@@ -100,7 +112,8 @@ const formSchema = z.object({
   audioFile: z.string().min(1, { message: "Audio is required" }),
 });
 
-const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
+const AddToeicExamForm = ({ exam, part5, part1, part2, part3, part4, part6, part7 }: AddExamFormProps) => {
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [isExamDeleting, setIsExamDeleting] = useState(false);
@@ -659,6 +672,7 @@ const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
                             <AddPart6
                               exam={exam}
                               handleDialogueOpen={handleDialogOpen}
+                              topics={topics}
                             />
                           </DialogContent>
                         </Dialog>
@@ -691,6 +705,7 @@ const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
                             <AddPart7
                               exam={exam}
                               handleDialogueOpen={handleDialogOpen}
+                              topics={topics}
                             />
                           </DialogContent>
                         </Dialog>
@@ -816,6 +831,7 @@ const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
                         exam={exam}
                         part6={part6}
                         index={index} // Truyền index đúng cách
+                        topics={topics}
                       />
                     ))}
                   </div>
@@ -833,6 +849,7 @@ const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
                         exam={exam}
                         part7={part7}
                         index={index} // Truyền index đúng cách
+                        topics={topics}
                       />
                     ))}
                   </div>
@@ -845,7 +862,7 @@ const AddToeicExamForm = ({ exam, part5, part1 }: AddExamFormProps) => {
           </div>
           {selectedTab === "answers" && (
                 <div>
-                  <UploadFile part5ss={part5} part1ss={part1} />
+                  <UploadFile part5ss={part5} part1ss={part1} part2ss={part2} part3ss={part3} part4ss={part4} part6ss={part6} part7ss={part7} />
                 </div>
               )}
         </form>

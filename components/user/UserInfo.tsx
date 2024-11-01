@@ -2,7 +2,7 @@
 import apiClient from "@/lib/api-client";
 import { USER_API_ROUTES } from "@/ultis/api-route";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Import usePathname
 import { Button } from "../ui/button";
 
 // Define the types for user data
@@ -16,11 +16,16 @@ interface User {
   updatedAt: Date;
 }
 
-const UserInfo = () => {
+interface UserInfoProps {
+  userId: string; // Receive userId as a prop
+}
+
+const UserInfo = ({ userId }: UserInfoProps) => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter(); // Sử dụng useRouter để điều hướng
+  const pathname = usePathname(); // Get current pathname
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,11 +49,18 @@ const UserInfo = () => {
   }, []);
 
   const handleStatisticsClick = () => {
-    router.push("/statistics"); // Chuyển trang tới /statistics
+    if (userInfo?.id) { // Ensure userInfo is not null and get the user ID
+      router.push(`/statistics/${userInfo.id}`); // Navigate to /statistics/userId
+    } else {
+      console.error("User ID is not defined.");
+    }
   };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading user info: {error}</div>;
+
+  // Check if the current route is statistics for the user
+  const isOnStatisticsPage = pathname === `/statistics/${userInfo?.id}`;
 
   return (
     <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
@@ -69,12 +81,15 @@ const UserInfo = () => {
                 year: "numeric",
               })}
             </p>
-            <Button
-              onClick={handleStatisticsClick}
-              className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            >
-              Thống kê kết quả
-            </Button>
+            {/* Conditionally render the button based on the current page */}
+            {!isOnStatisticsPage && (
+              <Button
+                onClick={handleStatisticsClick}
+                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Thống kê kết quả
+              </Button>
+            )}
           </div>
         </div>
       ) : (

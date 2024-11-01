@@ -1,15 +1,49 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ExamWithParts } from './AddToeicExamForm';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Clock, Users, List, QuoteIcon } from 'lucide-react';
+import apiClient from "@/lib/api-client";
+import { USER_API_ROUTES } from "@/ultis/api-route";
 
 const ExamCard = ({ exam }: { exam: ExamWithParts }) => {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const pathname = usePathname();
   const isMyExams = pathname.includes("my-exams");
   const router = useRouter();
+
+  // Fetch user ID
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await apiClient.get(USER_API_ROUTES.GET_USER);
+        if (response.data.user) {
+          setCurrentUserId(response.data.user.id); // Giả sử ID người dùng được trả về trong response
+        } else {
+          setError("User not found");
+        }
+      } catch (error) {
+        setError("Error fetching user info");
+        console.error("Error fetching user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // Kiểm tra xem người dùng đã làm bài thi hay chưa
+  const hasUserAnswers = currentUserId && (exam.userAnswers?.some(userAnswer => userAnswer.userId === currentUserId && userAnswer.examId === exam.id) || false);
+
+  console.log(hasUserAnswers)
+  if (loading) return <div>Loading...</div>; // Hiển thị loading khi đang fetch dữ liệu
+  if (error) return <div>{error}</div>; // Hiển thị lỗi nếu có
 
   return (
     <div
@@ -30,7 +64,7 @@ const ExamCard = ({ exam }: { exam: ExamWithParts }) => {
 
         {/* Số người đã làm */}
         <div className="text-primary/90 text-sm flex items-center gap-2">
-          <Users size={20} />  người
+          <Users size={20} /> {exam.userAnswers?.length || 0} người
         </div>
 
         {/* 7 phần thi */}
@@ -48,7 +82,7 @@ const ExamCard = ({ exam }: { exam: ExamWithParts }) => {
           onClick={() => router.push(`/details/${exam.id}`)}
           className="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm"
         >
-          Chi tiết
+          {hasUserAnswers ? "Xem kết quả" : "Chi tiết"}
         </button>
       </div>
     </div>

@@ -10,15 +10,17 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(cuid()) @map("_id")
+  id          String        @id @default(cuid()) @map("_id")
   username    String
-  email       String       @unique
+  email       String        @unique
   profilePic  String
-  clerkUserId String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  clerkUserId String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
   quizResults QuizResult[]
   answers     UserAnswer[]
+  examResults ExamResult[]  // Quan hệ với ExamResult để lưu kết quả thi của user
 }
 
 
@@ -46,6 +48,7 @@ model Exam {
   audioFile   String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  participantCount Int          @default(0) // Thêm thuộc tính này
 // Quan hệ với các phần câu hỏi
   part1s QuestionPart1[]
   part2s QuestionPart2[]
@@ -54,7 +57,8 @@ model Exam {
   part5s QuestionPart5[]
   part6s QuestionPart6[]
   part7s QuestionPart7[]
-  user   UserAnswer[]
+  userAnswers UserAnswer[]    // Quan hệ với UserAnswer để lưu câu trả lời
+  examResults ExamResult[]    // Quan hệ với ExamResult để lưu kết quả thi của các user
 }
 
 model TopicPart1 {
@@ -114,11 +118,13 @@ model QuestionPart1 {
   updatedAt      DateTime    @updatedAt
   examId        String
   topicId        String
+  groupId        String?
   
   Topic  TopicPart1?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart1") // Quan hệ với chủ đề
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart1")
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart1")
+   
 
 }
 
@@ -126,6 +132,7 @@ model QuestionPart1 {
 
 model QuestionPart2 {
   id             String      @id @default(cuid()) @map("_id")
+  imageFile      String?  
   audioFile      String      
   answer1        String
   answer2        String
@@ -136,13 +143,14 @@ model QuestionPart2 {
   updatedAt      DateTime    @updatedAt
   examId        String
   topicId        String
+  groupId        String?
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart2")
   Topic  TopicPart2?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart2") // Quan hệ với chủ đề
   
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart2")
-}
+   }
 
 model QuestionPart3 {
   id             String      @id @default(cuid()) @map("_id")
@@ -157,14 +165,15 @@ model QuestionPart3 {
   explainAnswer  String
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+  groupId        String?
   examId        String
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart3")
   Topic  TopicPart3?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart3") // Quan hệ với chủ đề
   topicId        String
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart3")
-
+   
 }
 
 model QuestionPart4 {
@@ -181,16 +190,18 @@ model QuestionPart4 {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   examId        String
+  groupId        String?
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart4")
   Topic  TopicPart4?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart4") // Quan hệ với chủ đề
   topicId        String
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart4")
-}
+   }
 
 model QuestionPart5 {
   id             String      @id @default(cuid()) @map("_id")
+  imageFile      String?  
   questionText   String  
   answer1        String
   answer2        String
@@ -201,13 +212,14 @@ model QuestionPart5 {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   examId        String
+  groupId        String?
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart5")
   Topic  TopicPart5?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart5") // Quan hệ với chủ đề
   topicId        String
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart5")
-}
+   }
 
 model QuestionPart6 {
   id             String      @id @default(cuid()) @map("_id") 
@@ -221,17 +233,21 @@ model QuestionPart6 {
  createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   examId        String
+  groupId        String?
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart6")
   Topic  TopicPart6?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart6") // Quan hệ với chủ đề
   topicId        String
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart6")
-}
+  }
 
 model QuestionPart7 {
   id             String      @id @default(cuid()) @map("_id")
-  imageFile      String 
+  questionText   String
+  imageFile      String
+  imageFile2     String?
+  imageFile3     String?
   answer1        String
   answer2        String
   answer3        String
@@ -241,12 +257,33 @@ model QuestionPart7 {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   examId        String
+   groupId        String?
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userAnswerDetails UserAnswerDetail[] @relation(name: "UserAnswerDetailToQuestionPart7")
   Topic  TopicPart7?  @relation(fields: [topicId], references: [id], name: "TopicToQuestionPart7") // Quan hệ với chủ đề
   topicId        String
   @@index([examId])
-   userAnswers    UserAnswer[] @relation(name: "RelationToQuestionPart7")
+   }
+
+model ExamResult {
+  id             String     @id @default(cuid()) @map("_id")
+  user           User       @relation(fields: [userId], references: [id])
+  userId         String
+  exam           Exam       @relation(fields: [examId], references: [id], onDelete: Cascade)
+  examId         String
+  
+  scoreListening Int        // Điểm phần nghe
+  scoreReading   Int        // Điểm phần đọc
+  totalScore     Int        // Tổng điểm
+  numberCorrect  Int        // Số câu đúng
+  numberWrong    Int        // Số câu sai
+  numberSkip     Int        // Số câu bỏ qua
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([userId, examId], name: "user_exam_index")
 }
 
 model UserAnswer {
@@ -254,44 +291,44 @@ model UserAnswer {
   user              User           @relation(fields: [userId], references: [id])
   userId            String
 
-  part1sId   String
-  part2sId   String
-  part3sId   String
-  part4sId   String
-  part5sId   String
-  part6sId   String
-  part7sId   String
-  
-  part1s     QuestionPart1? @relation(fields: [part1sId], references: [id], name: "RelationToQuestionPart1")
-  part2s     QuestionPart2? @relation(fields: [part2sId], references: [id], name: "RelationToQuestionPart2")
-  part3s     QuestionPart3? @relation(fields: [part3sId], references: [id], name: "RelationToQuestionPart3")
-  part4s     QuestionPart4? @relation(fields: [part4sId], references: [id], name: "RelationToQuestionPart4")
-  part5s     QuestionPart5? @relation(fields: [part5sId], references: [id], name: "RelationToQuestionPart5")
-  part6s     QuestionPart6? @relation(fields: [part6sId], references: [id], name: "RelationToQuestionPart6")
-  part7s     QuestionPart7? @relation(fields: [part7sId], references: [id], name: "RelationToQuestionPart7")
+  exam              Exam?          @relation(fields: [examId], references: [id], onDelete: Cascade)
+  examId            String?
 
-  selectedAnswer   String      // Câu trả lời của người dùng
-  isCorrect        Boolean     // Đúng hay sai
-  isSkipped        Boolean     // Có bỏ qua hay không
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  scoreListening    Int
+  scoreReading      Int
+  totalScore        Int
+  numberCorrect     Int
+  numberWrong       Int
+  numberSkip        Int
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
-  scoreListening   String
-  scoreReading     String
-  totalScore       String
-  numberCorrect    String
-  numberWrong      String
-  numberSkip       String
-  numberUser       String
+  UserAnswerDetail  UserAnswerDetail[]
 
-  examId           String
-  examOwnerId      String
-  date             DateTime
-  time             String
-
-  Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
   @@index([examId])
 }
+
+model UserAnswerDetail {
+  id            String       @id @default(cuid()) @map("_id")
+  userAnswer    UserAnswer   @relation(fields: [userAnswerId], references: [id], onDelete: Cascade)
+  userAnswerId  String
+  questionId    String       // liên kết tới câu hỏi cụ thể
+  selectedAnswer String
+  isCorrect     Boolean
+  isSkipped     Boolean
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Liên kết với các phần câu hỏi để truy xuất thông tin chi tiết
+  questionPart1   QuestionPart1? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart1")
+  questionPart2   QuestionPart2? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart2")
+  questionPart3   QuestionPart3? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart3")
+  questionPart4   QuestionPart4? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart4")
+  questionPart5   QuestionPart5? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart5")
+  questionPart6   QuestionPart6? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart6")
+  questionPart7   QuestionPart7? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailToQuestionPart7")
+}
+
 
 model Course {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId

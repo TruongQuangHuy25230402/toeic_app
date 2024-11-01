@@ -28,5 +28,7 @@ export const USER_API_ROUTES = {
     GET_data_PART6:"/part6",
     GET_data_PART7:"/part7",
     GET_EXAM:"/exam",
+    GET_DETAIL:"/userAnswerDetail",
+    GET_USER_ANSWER:"/userAnswer",
 }
 

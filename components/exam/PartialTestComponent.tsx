@@ -3,7 +3,6 @@ import Result from "./Result";
 import DictionaryPopup from "./dictionary";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import {
-  UserAnswer,
   Exam,
   QuestionPart1,
   QuestionPart2,
@@ -12,14 +11,8 @@ import {
   QuestionPart5,
   QuestionPart6,
   QuestionPart7,
-  TopicPart1,
-  TopicPart2,
-  TopicPart3,
-  TopicPart4,
-  TopicPart5,
-  TopicPart6,
-  TopicPart7,
 } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import HighlightableText from "../HighlightableAnswer";
 
 type Question =
@@ -31,43 +24,53 @@ type Question =
   | QuestionPart6
   | QuestionPart7;
 
-interface myResultProps {
-  result: UserAnswer & {
-    Exam: Exam | null;
-    TopicPart1: TopicPart1 | null;
-    TopicPart2: TopicPart2 | null;
-    TopicPart3: TopicPart3 | null;
-    TopicPart4: TopicPart4 | null;
-    TopicPart5: TopicPart5 | null;
-    TopicPart6: TopicPart6 | null;
-    TopicPart7: TopicPart7 | null;
-    QuestionPart1: QuestionPart1 | null;
-    QuestionPart2: QuestionPart2 | null;
-    QuestionPart3: QuestionPart3 | null;
-    QuestionPart4: QuestionPart4 | null;
-    QuestionPart5: QuestionPart5 | null;
-    QuestionPart6: QuestionPart6 | null;
-    QuestionPart7: QuestionPart7 | null;
-  };
-}
+  interface UserAnswerDetail {
+    questionId: string; // Hoặc kiểu dữ liệu tương ứng
+    selectedAnswer: string;
+    isCorrect: boolean;
+    isSkipped: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+  
+  interface UserAnswer {
+    id: string | null; // Bắt buộc
+    userId: string;
+    examId: string | null;
+    scoreListening: number;
+    scoreReading: number;
+    totalScore: number;
+    numberCorrect: number;
+    numberWrong: number;
+    numberSkip: number;
+    createdAt: Date;
+    updatedAt: Date;
+    userAnswerDetail: UserAnswerDetail[]; // Đảm bảo có thuộc tính này
+  }
+
+
 
 const PartialTestComponent = ({
   timeLimit,
   selectedParts,
   exam,
-}: {
+}: { 
   timeLimit: number;
   selectedParts: number[];
   exam: {
     part1s: QuestionPart1[];
-    part2s: QuestionPart2[];
-    part3s: QuestionPart3[];
-    part4s: QuestionPart4[];
-    part5s: QuestionPart5[];
-    part6s: QuestionPart6[];
-    part7s: QuestionPart7[];
+  part2s: QuestionPart2[];
+  part3s: QuestionPart3[];
+  part4s: QuestionPart4[];
+  part5s: QuestionPart5[];
+  part6s: QuestionPart6[];
+  part7s: QuestionPart7[];
+  audioFile?: string; // Add audioFile property
+  title: string;
+  id: string;
   };
 }) => {
+  
   const [timeRemaining, setTimeRemaining] = useState(timeLimit * 60);
   const [showResult, setShowResult] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -80,11 +83,13 @@ const PartialTestComponent = ({
   const [skippedAnswersCount, setSkippedAnswersCount] = useState(0);
   const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
   const [timeTaken, setTimeTaken] = useState(0);
-
+  const router = useRouter();
   const listeningParts = [1, 2, 3, 4]; // Listening parts
   const readingParts = [5, 6, 7]; // Reading parts
   const [currentPart, setCurrentPart] = useState(0);
-
+  
+  const questionsPerPart = [6, 25, 39, 30, 30, 16, 54];
+  const [userId, setUserId] = useState<string>(''); // Giá trị ban đầu là chuỗi rỗng
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -100,78 +105,25 @@ const PartialTestComponent = ({
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = async () => {
-    let totalListeningScore = 0;
-    let totalReadingScore = 0;
-    let correctCount = 0;
-    let skippedCount = 0;
-    let wrongCount = 0;
-    setTimeTaken(timeLimit * 60 - timeRemaining);
-  
-    const userAnswers: UserAnswer[] = selectedQuestions.map((question) => {
-      const selectedAnswer = selectedAnswers[question.id] || "";
-      const isCorrect = selectedAnswer === question.correctAnswer;
-  
-      if (isCorrect) {
-        correctCount += 1;
-        if (listeningParts.includes(partForQuestion(question))) {
-          totalListeningScore += 5; // Listening part score
-        } else if (readingParts.includes(partForQuestion(question))) {
-          totalReadingScore += 5; // Reading part score
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/user");
+        if (!response.ok) {
+          throw new Error("Failed to fetch user");
         }
-      } else if (!selectedAnswer) {
-        skippedCount += 1;
-      } else {
-        wrongCount += 1;
+        const data = await response.json();
+        console.log("Fetched user data:", data); // In dữ liệu ra console để kiểm tra
+        setUserId(data.userId); // Lưu userId vào state
+      } catch (error) {
+        console.error("Error fetching user data:", error);
       }
+    };
   
-      let userAnswer: Partial<UserAnswer> = {
-        selectedAnswer,
-        isCorrect,
-        isSkipped: !selectedAnswer,
-      };
+    fetchUser();
+  }, []);
+
   
-      if (exam.part1s.includes(question as QuestionPart1)) {
-        userAnswer.part1sId = question.id;
-      } else if (exam.part2s.includes(question as QuestionPart2)) {
-        userAnswer.part2sId = question.id;
-      } else if (exam.part3s.includes(question as QuestionPart3)) {
-        userAnswer.part3sId = question.id;
-      } else if (exam.part4s.includes(question as QuestionPart4)) {
-        userAnswer.part4sId = question.id;
-      } else if (exam.part5s.includes(question as QuestionPart5)) {
-        userAnswer.part5sId = question.id;
-      } else if (exam.part6s.includes(question as QuestionPart6)) {
-        userAnswer.part6sId = question.id;
-      } else if (exam.part7s.includes(question as QuestionPart7)) {
-        userAnswer.part7sId = question.id;
-      }
-  
-      return userAnswer as UserAnswer;
-    });
-  
-    // Tính điểm tổng
-    const score = totalListeningScore + totalReadingScore;
-  
-   // try {
-     // await fetch("/api/userAnswers", {
-       // method: "POST",
-       // headers: {
-       //   "Content-Type": "application/json",
-      //  },
-       // body: JSON.stringify({ userAnswers }),
-      //});
-    //} catch (error) {
-    //  console.error("Error saving user answers:", error);
-    //}
-  
-    setCorrectAnswersCount(correctCount);
-    setSkippedAnswersCount(skippedCount);
-    setWrongAnswersCount(wrongCount);
-    setListeningScore(totalListeningScore);
-    setReadingScore(totalReadingScore);
-    setShowResult(true);
-  };
 
   const selectedQuestions = selectedParts.reduce<Question[]>((acc, part) => {
     let questions: Question[] = [];
@@ -237,35 +189,140 @@ const PartialTestComponent = ({
     return 0;
   };
 
-  if (showResult) {
-    return (
-      <Result
-        listeningScore={listeningScore}
-        readingScore={readingScore}
-        correctCount={correctAnswersCount}
-        wrongCount={wrongAnswersCount}
-        skippedCount={skippedAnswersCount}
-        timeTaken={timeTaken}
-        totalQuestions={selectedQuestions.length}
-        score={listeningScore + readingScore} // Truyền điểm tổng
-        listeningCorrect={0}
-        readingCorrect={0}
-      />
-    );
+  
+
+// Tính toán các câu hỏi thuộc phần hiện tại
+const startIndex = selectedParts
+  .slice(0, currentPart) // Lấy các phần đã chọn cho đến phần hiện tại
+  .reduce((acc, curr) => acc + questionsPerPart[curr - 1], 0); // curr - 1 vì selectedParts bắt đầu từ 1
+
+const count = questionsPerPart[selectedParts[currentPart] - 1]; // Lấy số lượng câu hỏi cho phần hiện tại
+
+// Lấy câu hỏi cho phần hiện tại
+const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
+
+
+
+  const handleSubmit = async () => {
+    let totalListeningScore = 0;
+    let totalReadingScore = 0;
+    let correctCount = 0;
+    let skippedCount = 0;
+    let wrongCount = 0;
+    setTimeTaken(timeLimit * 60 - timeRemaining);
+    // Tạo một đối tượng UserAnswer để lưu thông tin
+    const userAnswerData: UserAnswer = {
+      userId: userId, // Thêm userId vào đây
+      examId: exam.id, // Id của bài thi hiện tại
+      scoreListening: totalListeningScore,
+      scoreReading: totalReadingScore,
+      totalScore: totalListeningScore + totalReadingScore,
+      numberCorrect: correctCount,
+      numberWrong: wrongCount,
+      numberSkip: skippedCount,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userAnswerDetail: [],
+      id: ""
+    };
+  
+    // Tính toán câu trả lời của người dùng
+    selectedQuestions.forEach((question) => {
+      const selectedAnswer = selectedAnswers[question.id] || "";
+      const isCorrect = selectedAnswer === question.correctAnswer;
+  
+      // Cập nhật số lượng đúng, sai và bỏ qua
+      if (isCorrect) {
+        correctCount += 1;
+  
+        // Tính điểm cho phần nghe và đọc
+        if (listeningParts.includes(partForQuestion(question))) {
+          totalListeningScore += 5; // Điểm phần nghe
+        } else if (readingParts.includes(partForQuestion(question))) {
+          totalReadingScore += 5; // Điểm phần đọc
+        }
+      } else if (!selectedAnswer) {
+        skippedCount += 1;
+      } else {
+        wrongCount += 1;
+      }
+  
+      // Thêm thông tin chi tiết câu trả lời
+      userAnswerData.userAnswerDetail.push({
+        questionId: question.id,
+        selectedAnswer: selectedAnswer,
+        isCorrect: isCorrect,
+        isSkipped: !selectedAnswer,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    });
+  
+    // Cập nhật điểm số tổng
+    userAnswerData.scoreListening = totalListeningScore;
+    userAnswerData.scoreReading = totalReadingScore;
+    userAnswerData.totalScore = totalListeningScore + totalReadingScore;
+    userAnswerData.numberCorrect = correctCount;
+    userAnswerData.numberWrong = wrongCount;
+    userAnswerData.numberSkip = skippedCount;
+
+  
+    // Lưu kết quả thi vào cơ sở dữ liệu
+    try {
+      await fetch("/api/examResults", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          examId: exam.id,
+          scoreListening: totalListeningScore,
+          scoreReading: totalReadingScore,
+          totalScore: totalListeningScore + totalReadingScore,
+          numberCorrect: correctCount,
+          numberWrong: wrongCount,
+          numberSkip: skippedCount,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }),
+      });
+
+    
+      // Lưu từng UserAnswer chi tiết
+    const userAnswerResponse = await fetch("/api/userAnswers", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+          ...userAnswerData, // Kết hợp dữ liệu userAnswerData
+          userId: userId, // Thêm userId vào đây
+      }),
+  });
+
+  const userAnswer = await userAnswerResponse.json(); // Giả sử trả về thông tin UserAnswer, bao gồm ID
+
+  // Chuyển hướng đến trang UserAnswer chi tiết
+  if (userAnswer.id) {
+      router.push(`/userAnswer/${userAnswer.id}`);
   }
 
-  const questionsPerPart = [6, 25, 39, 30, 30, 16, 54];
+    // Cập nhật trạng thái với số lượng câu trả lời
+    setCorrectAnswersCount(correctCount);
+    setSkippedAnswersCount(skippedCount);
+    setWrongAnswersCount(wrongCount);
+    setListeningScore(totalListeningScore);
+    setReadingScore(totalReadingScore);
+    
+  }catch (error) {
+    console.error("Error fetching user data:", error);
+  }
 
-  // Tính toán các câu hỏi thuộc phần hiện tại
-  // Tính toán chỉ số bắt đầu và số lượng câu hỏi cho phần hiện tại
-  const startIndex = selectedParts
-    .slice(0, currentPart) // Lấy các phần đã chọn cho đến phần hiện tại
-    .reduce((acc, curr) => acc + questionsPerPart[curr - 1], 0); // curr - 1 vì selectedParts bắt đầu từ 1, nhưng questionsPerPart bắt đầu từ 0
 
-  const count = questionsPerPart[selectedParts[currentPart] - 1]; // Lấy số lượng câu hỏi cho phần hiện tại
-
-  // Lấy câu hỏi cho phần hiện tại
-  const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
+    
+  };
+  
 
   
   return (
@@ -284,32 +341,70 @@ const PartialTestComponent = ({
         </div>
           
         {partQuestions.length === 0 ? (
-          <p>Không có câu hỏi nào được chọn.</p>
-        ) : (
-          partQuestions.map((question, index) => (
-            <div
-              key={question.id}
-              className="my-4 bg-gray-100 border p-2 rounded"
-            >
-              <div className="mt-2">
-                <strong>Câu hỏi {startIndex + index + 1}</strong>
-              </div>
-              <h3 className="font-semibold">
-                {(question as any).questionText || ""}
-              </h3>
-              {"audioFile" in question && question.audioFile && (
-                <audio controls>
+  <p>Không có câu hỏi nào được chọn.</p>
+) : (
+  (() => {
+    const groupedQuestions: { [key: string]: any[] } = {};
+
+    // Organize questions by groupId
+    partQuestions.forEach((question) => {
+      const groupId = question.groupId || "ungrouped"; // Use "ungrouped" for questions without a groupId
+
+      if (!groupedQuestions[groupId]) {
+        groupedQuestions[groupId] = [];
+      }
+      groupedQuestions[groupId].push(question);
+    });
+
+    const groupIds = Object.keys(groupedQuestions);
+
+    let overallIndex = startIndex; // Start from the overall start index
+
+    return groupIds.map((groupId) => {
+      const questionsInGroup = groupedQuestions[groupId];
+
+      // Check if it's an ungrouped question or a group
+      if (groupId === "ungrouped") {
+        // Render ungrouped questions individually
+        return questionsInGroup.map((question) => {
+          const currentIndex = overallIndex++; // Use and increment the overall index
+          const images = [
+            question.imageFile,
+            question.imageFile2,
+            question.imageFile3,
+          ].filter(Boolean);
+
+          return (
+            <div key={question.id} className="mb-4">
+              {images.length > 0 && (
+                <div
+                  className="flex-shrink-0 overflow-y-auto space-y-2 mb-2"
+                  style={{ maxHeight: '500px' }} // Set max height for scrolling
+                >
+                  {images.map((imageFile: string, index: number) => (
+                    <img
+                      key={index}
+                      src={imageFile}
+                      alt={`Hình ảnh ${index + 1}`}
+                      className="mb-2 rounded"
+                      style={{ width: '500px', height: 'auto' }}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              <strong>Câu hỏi {currentIndex + 1}</strong>
+              {question.audioFile && (
+                <audio controls className="my-2">
                   <source src={question.audioFile} type="audio/mpeg" />
-                  Your browser does not support the audio element.
+                  Trình duyệt của bạn không hỗ trợ phát âm thanh.
                 </audio>
               )}
-              {"imageFile" in question && question.imageFile && (
-                <img
-                  src={question.imageFile}
-                  alt={`Câu hỏi ${startIndex + index + 1}`}
-                  className="mt-2 rounded"
-                />
-              )}
+              <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '2' }}>
+                {question.questionText || ""}
+              </h3>
+              
+
               {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
                 const answer = (question as any)[answerKey];
                 return answer ? (
@@ -325,13 +420,91 @@ const PartialTestComponent = ({
                         }))
                       }
                     />
-                    {answer} 
+                    {answer}
                   </label>
                 ) : null;
               })}
             </div>
-          ))
-        )}
+          );
+        });
+      } else {
+        // Render grouped questions in a single box
+        const images = [
+          questionsInGroup[0]?.imageFile,
+          questionsInGroup[0]?.imageFile2,
+          questionsInGroup[0]?.imageFile3,
+        ].filter(Boolean);
+
+        return (
+          <div key={groupId} className="mb-4">
+            <div className="flex my-4 bg-gray-100 border p-2 rounded">
+              {images.length > 0 && (
+                <div
+                  className="flex-shrink-0 overflow-y-auto space-y-2"
+                  style={{ maxHeight: '400px' }} // Set max height for scrolling
+                >
+                  {images.map((imageFile: string, index: number) => (
+                    <img
+                      key={index}
+                      src={imageFile}
+                      alt={`Hình ảnh ${index + 1} của nhóm câu hỏi ${groupId}`}
+                      className="mb-2 rounded"
+                      style={{ width: '500px', height: 'auto' }}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex-grow overflow-y-auto max-h-60 ml-4">
+                {questionsInGroup.map((question) => {
+                  const currentIndex = overallIndex++; // Use and increment the overall index
+
+                  return (
+                    <div key={question.id} className="my-2">
+                      <div className="mt-2">
+                        <strong>Câu hỏi {currentIndex + 1}</strong>
+                      </div>
+                      <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '1.5' }}>
+                        {question.questionText || ""}
+                      </h3>
+                      {question.audioFile && (
+                <audio controls className="my-2">
+                  <source src={question.audioFile} type="audio/mpeg" />
+                  Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                </audio>
+              )}
+
+                      {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
+                        const answer = (question as any)[answerKey];
+                        return answer ? (
+                          <label className="block" key={answerKey}>
+                            <input
+                              type="radio"
+                              name={`question-${question.id}`}
+                              checked={selectedAnswers[question.id] === answer}
+                              onChange={() =>
+                                setSelectedAnswers((prev) => ({
+                                  ...prev,
+                                  [question.id]: answer,
+                                }))
+                              }
+                            />
+                            {answer}
+                          </label>
+                        ) : null;
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+    });
+  })()
+)}
+
 
         {/* Nút Trang Tiếp Theo */}
         {selectedParts.length > 0 && currentPart < selectedParts.length && (
@@ -363,39 +536,46 @@ const PartialTestComponent = ({
 
         <h3 className="mt-4 font-bold">Trạng thái câu hỏi đã chọn:</h3>
 
-        {selectedParts.map((part) => {
-          const count = questionsPerPart[part - 1]; // Số câu hỏi cho phần này
-          const startIndex = questionsPerPart
-            .slice(0, part - 1)
-            .reduce((acc, curr) => acc + curr, 0); // Tính chỉ số bắt đầu cho phần
-          const partQuestions = selectedQuestions.slice(
-            startIndex,
-            startIndex + count
-          ); // Lấy câu hỏi cho phần hiện tại
+        {selectedParts.map((part, index) => {
+  // Calculate start index by summing up only selected parts' question counts before this part
+  const startIndex = selectedParts
+    .slice(0, index)
+    .reduce((acc, currPart) => acc + questionsPerPart[currPart - 1], 0);
 
-          return (
-            <div key={part} className="mt-2">
-              <h4 className="font-semibold">Part {part}</h4>
-              <div className="flex flex-wrap">
-                {partQuestions.map((question, index) => (
-                  <div
-                    key={question.id}
-                    className={`w-6 h-6 rounded-full mr-2 mb-2 ${selectedAnswers[question.id] ? "bg-blue-500" : "bg-gray-300"}`}
-                    onClick={() => {
-                      setCurrentPart(part - 1); // Chuyển đến part tương ứng (bằng cách giảm 1 vì index bắt đầu từ 0)
-                      window.scrollTo({ top: 0, behavior: "smooth" }); // Cuộn trang lên đầu
-                    }}
-                    style={{ cursor: "pointer" }} // Thêm cursor pointer để tạo cảm giác tương tác
-                  >
-                    <span className="text-white text-xs flex justify-center items-center h-full">
-                      {startIndex + index + 1}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+  // Get the count for the current part
+  const count = questionsPerPart[part - 1];
+  const partQuestions = selectedQuestions.slice(
+    startIndex,
+    startIndex + count
+  );
+
+  return (
+    <div key={part} className="mt-2">
+      <h4 className="font-semibold">Part {part}</h4>
+      <div className="flex flex-wrap">
+        {partQuestions.map((question, i) => (
+          <div
+            key={question.id}
+            className={`w-6 h-6 rounded-full mr-2 mb-2 ${
+              selectedAnswers[question.id] ? "bg-blue-500" : "bg-gray-300"
+            }`}
+            onClick={() => {
+              setCurrentPart(part - 1); // Navigate to the corresponding part
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <span className="text-white text-xs flex justify-center items-center h-full">
+              {startIndex + i + 1}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+})}
+
+
 
         <button
           onClick={handleSubmit}

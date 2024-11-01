@@ -31,7 +31,7 @@ const ArrayPart3 = ({ exam, part3, index }: ArrayPart3Props) => {
   };
 
   return (
-    <div className="flex justify-start items-start gap-2 flex-nowrap">
+    <div className="flex justify-start items-start gap-0 flex-nowrap">
       <Button
         type="button"
         variant="outline"

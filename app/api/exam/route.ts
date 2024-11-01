@@ -28,6 +28,7 @@ export async function GET() {
                 part5s: true,
                 part6s: true,
                 part7s: true,
+                userAnswers: true
             },
         });
 
@@ -38,6 +39,7 @@ export async function GET() {
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }
+
 
 
   

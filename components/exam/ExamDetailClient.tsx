@@ -7,6 +7,7 @@ import FullTestComponent from "./FullTestComponent";
 import PartialTestComponent from "./PartialTestComponent";
 import apiClient from "@/lib/api-client";
 import { USER_API_ROUTES } from "@/ultis/api-route";
+import DetailUserAnswer from "./DetailUserAnswer";
 
 type Topic = {
   id: string;
@@ -177,9 +178,11 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
             <div>
               <div className="rounded-lg mb-4">
                 <p className="text-primary/90 mb-2">
-                  Thời gian làm bài: 120 phút | 7 phần thi | 200 câu hỏi | Số
-                  lượt làm đề thi: {testAttemptCount}
+                  Thời gian làm bài: 120 phút | 7 phần thi | 200 câu hỏi 
                 </p>
+              </div>
+
+              <div>
               </div>
 
               {/* Chọn chế độ làm bài */}
@@ -230,37 +233,36 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
                       {
                         title: "Part 1",
                         questions: exam.part1s,
-                        topics: topics.part1s,
+                        
                       },
                       {
                         title: "Part 2",
                         questions: exam.part2s,
-                        topics: topics.part2s,
+                        
                       },
                       {
                         title: "Part 3",
                         questions: exam.part3s,
-                        topics: topics.part3s,
+                      
                       },
                       {
                         title: "Part 4",
                         questions: exam.part4s,
-                        topics: topics.part4s,
+                      
                       },
                       {
                         title: "Part 5",
                         questions: exam.part5s,
-                        topics: topics.part5s,
+                      
                       },
                       {
                         title: "Part 6",
                         questions: exam.part6s,
-                        topics: topics.part6s,
+                      
                       },
                       {
                         title: "Part 7",
                         questions: exam.part7s,
-                        topics: topics.part7s,
                       },
                     ]
                       .filter((part) => part.questions.length > 0)
@@ -284,13 +286,7 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
                             </label>
                             <strong className="mr-2">{part.title}</strong>
                             <span>({part.questions.length} câu hỏi)</span>
-                            <div className="ml-6">
-                              {part.topics.map((topic, topicIndex) => (
-                                <div key={topicIndex} className="mt-1">
-                                  {topic.name} {/* Hiển thị tên chủ đề */}
-                                </div>
-                              ))}
-                            </div>
+                            
                           </div>
                         </div>
                       ))}
@@ -328,7 +324,7 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
               {/* Nội dung Đáp án chi tiết */}
               <div className="rounded-lg mb-4">
                 <h3 className="font-semibold text-xl md:text-2xl">
-                  Đáp án chi tiết
+                  Chi tiết
                 </h3>
               </div>
             </div>
@@ -338,7 +334,7 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
         <div>
           {/* Hiển thị FullTestComponent hoặc PartialTestComponent */}
           {testMode === "full" ? (
-            <FullTestComponent />
+            <FullTestComponent exam={exam}  />
           ) : (
             <PartialTestComponent
               exam={exam}

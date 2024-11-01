@@ -11,6 +11,7 @@ export const getExamById = async (examId: string) => {
                 part1s: {
                     include: {
                         Topic: true, // Bao gồm thông tin Topic cho Part 1
+
                     },
                 },
                 part2s: {
@@ -21,6 +22,7 @@ export const getExamById = async (examId: string) => {
                 part3s: {
                     include: {
                         Topic: true, // Bao gồm thông tin Topic cho Part 3
+                        
                     },
                 },
                 part4s: {
@@ -43,7 +45,9 @@ export const getExamById = async (examId: string) => {
                         Topic: true, // Bao gồm thông tin Topic cho Part 7
                     },
                 },
+
             },
+            
         });
 
         if (!exam) return null;

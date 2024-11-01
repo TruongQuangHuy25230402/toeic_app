@@ -1,4 +1,4 @@
-import { Exam, QuestionPart6 } from '@prisma/client';
+import { Exam, QuestionPart6, TopicPart6 } from '@prisma/client';
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -17,10 +17,13 @@ interface ArrayPart6Props {
   };
   part6: QuestionPart6;
   index: number; // Thêm index vào đây
+  topics: TopicPart6[];
 }
 
 const ArrayPart6 = ({ exam, part6, index }: ArrayPart6Props) => {
   const [open, setOpen] = useState(false);
+
+  const [topics, setTopics] = useState<TopicPart6[]>([]);
 
   const handleOpenDialogue = () => {
     setOpen((prev) => !prev);
@@ -34,7 +37,7 @@ const ArrayPart6 = ({ exam, part6, index }: ArrayPart6Props) => {
         className="w-12 h-12 rounded-full flex items-center justify-center"
         onClick={handleOpenDialogue}
       >
-        {index + 1} {/* Hiển thị số từ 6 đến 6 */}
+        {index + 131} {/* Hiển thị số từ 6 đến 6 */}
       </Button>
       <Dialog open={open} onOpenChange={() => setOpen(false)}>
         <DialogTrigger asChild>
@@ -42,15 +45,16 @@ const ArrayPart6 = ({ exam, part6, index }: ArrayPart6Props) => {
         </DialogTrigger>
         <DialogContent className="max-w-[900px] w-[90%]">
           <DialogHeader className="px-2">
-            <DialogTitle>Update Room {index + 1}</DialogTitle>
+            <DialogTitle>Update Question {index + 131}</DialogTitle>
             <DialogDescription>
-              Make changes to this room
+              Make changes to this question
             </DialogDescription>
           </DialogHeader>
           <AddPart6
             exam={exam}
             part6={part6}
             handleDialogueOpen={() => setOpen(false)}
+            topics={topics}
           />
         </DialogContent>
       </Dialog>

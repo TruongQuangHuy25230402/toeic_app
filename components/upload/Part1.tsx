@@ -7,7 +7,6 @@ import { QuestionPart1 } from "@prisma/client";
 import axios from "axios";
 import { UploadButton } from "../uploadthing";
 
-
 const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -77,12 +76,17 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
   }
 
   async function clearData() {
-    try {
-      await deletePart1s(examId);
-      // Reload the current page after clearing data
-      window.location.reload();
-    } catch (error) {
-      console.log(error);
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear all data?"
+    );
+    if (confirmClear) {
+      try {
+        await deletePart1s(examId);
+        // Reload the current page after clearing data
+        window.location.reload();
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -104,18 +108,21 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
     setIsExcelUpload((prev) => !prev); // Chuyển trạng thái giữa hai phần
   };
 
-   return (
+  return (
     <div className="py-8 space-y-8">
       {/* Nút chuyển đổi giữa Upload Excel và Upload Image/Audio */}
-      
-      <div className="text-center">
-        <button
-          onClick={toggleUploadType}
-          className="py-2 px-6 rounded bg-blue-600 text-slate-100"
-        >
-          {isExcelUpload ? "Switch to Image/Audio Upload" : "Switch to Excel Upload"}
-        </button>
-      </div>
+      {arrPart1.length === 0 && (
+        <div className="text-center">
+          <button
+            onClick={toggleUploadType}
+            className="py-2 px-6 rounded bg-blue-600 text-slate-100"
+          >
+            {isExcelUpload
+              ? "Switch to Image/Audio Upload"
+              : "Switch to Excel Upload"}
+          </button>
+        </div>
+      )}
 
       {/* Hiển thị phần upload dựa trên trạng thái */}
       {isExcelUpload ? (
@@ -134,12 +141,24 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
               <table className="w-full text-sm text-left rtl:text-right text-gray-800 dark:text-gray-200">
                 <thead className="text-xs text-gray-800 uppercase bg-gray-200 dark:bg-gray-700">
                   <tr>
-                    <th scope="col" className="px-6 py-3">Answer 1</th>
-                    <th scope="col" className="px-6 py-3">Answer 2</th>
-                    <th scope="col" className="px-6 py-3">Answer 3</th>
-                    <th scope="col" className="px-6 py-3">Answer 4</th>
-                    <th scope="col" className="px-6 py-3">Correct</th>
-                    <th scope="col" className="px-6 py-3">Explanation</th>
+                    <th scope="col" className="px-6 py-3">
+                      Answer 1
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Answer 2
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Answer 3
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Answer 4
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Correct
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Explanation
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,7 +183,10 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
                         {part1.correctAnswer}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="truncate max-w-xs" title={part1.explainAnswer}>
+                        <div
+                          className="truncate max-w-xs"
+                          title={part1.explainAnswer}
+                        >
                           {part1.explainAnswer}
                         </div>
                       </td>
@@ -185,7 +207,9 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
                     id="file_input"
                     type="file"
                     accept=".xls,.xlsx"
-                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    onChange={(e) =>
+                      setFile(e.target.files ? e.target.files[0] : null)
+                    }
                   />
                 </div>
                 <button
@@ -209,7 +233,9 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
       ) : (
         // Phần upload Image/Audio
         <div className="max-w-4xl mx-auto p-4 bg-gray-100 rounded-lg shadow-md">
-          <h1 className="text-2xl font-semibold text-center mb-6">File Upload</h1>
+          <h1 className="text-2xl font-semibold text-center mb-6">
+            File Upload
+          </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Image Upload Section */}
             <div className="p-4 bg-white rounded-lg shadow">
@@ -219,7 +245,10 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
                 onClientUploadComplete={(res) => {
                   const urls = res.map((file) => file.url);
                   setImageUrls(urls);
-                  console.log("Image Upload response: ", { message: "Image Upload Completed", fileUrls: urls });
+                  console.log("Image Upload response: ", {
+                    message: "Image Upload Completed",
+                    fileUrls: urls,
+                  });
                 }}
                 onUploadError={(error: Error) => {
                   alert(`ERROR! ${error.message}`);
@@ -231,7 +260,12 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
                   <ul className="list-disc list-inside">
                     {imageUrls.map((url, index) => (
                       <li key={index}>
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
                           {url}
                         </a>
                       </li>
@@ -249,7 +283,10 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
                 onClientUploadComplete={(res) => {
                   const urls = res.map((file) => file.url);
                   setAudioUrls(urls);
-                  console.log("Audio Upload response: ", { message: "Audio Upload Completed", fileUrls: urls });
+                  console.log("Audio Upload response: ", {
+                    message: "Audio Upload Completed",
+                    fileUrls: urls,
+                  });
                 }}
                 onUploadError={(error: Error) => {
                   alert(`ERROR! ${error.message}`);
@@ -261,7 +298,12 @@ const Part1 = ({ part1s }: { part1s: Part1Props[] }) => {
                   <ul className="list-disc list-inside">
                     {audioUrls.map((url, index) => (
                       <li key={index}>
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
                           {url}
                         </a>
                       </li>

@@ -20,7 +20,7 @@ export const ourFileRouter = {
     }),
 
   // Uploader for audio files
-  audioUploader: f({ audio: { maxFileSize: "64MB", maxFileCount: 30 } })
+  audioUploader: f({ audio: { maxFileSize: "64MB", maxFileCount: 40 } })
     .middleware(async ({ req }) => {
       const { userId } = auth();
 
