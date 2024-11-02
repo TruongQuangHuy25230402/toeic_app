@@ -4,10 +4,8 @@ import { auth } from '@clerk/nextjs/server';
 import {prisma} from "@/lib/prisma"
 
 
-const {video} = new Mux(
-    tokenId: process.env.MUX_TOKEN_ID, 
-    tokenSecret: process.env.MUX_TOKEN_SECRET
-)
+const { video } = new Mux(process.env.MUX_TOKEN_ID!, process.env.MUX_TOKEN_SECRET!);
+
 export async function DELETE(
     req: Request,
     {params} : {params: {courseId: string, chapterId: string}}
