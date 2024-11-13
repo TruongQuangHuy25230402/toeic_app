@@ -1,0 +1,33 @@
+
+
+import { getListExams } from '@/actions/getListExams';
+import { getUAnswer } from '@/actions/getUAnswer';
+import ExamsList from '@/components/exams/ExamsList';
+import UserInfo from '@/components/user/UserInfo';
+import React from 'react'
+
+const MyExam = async () => {
+  const exams = await getListExams();
+  const user_Answers = await getUAnswer();
+
+
+  if (!exams) return <div>No Exams found!</div>;
+  
+  return (
+    <main className="flex-grow max-w-6xl mx-auto px-4"> {/* Giới hạn chiều rộng */}
+      <div className="flex gap-4"> {/* Sử dụng flexbox để chia 75/25 */}
+        <div className="w-3/4"> {/* 75% chiều rộng cho ExamList */}
+        <ExamsList exams={exams} user_Answers={user_Answers} />
+        </div>
+        <div className="w-1/4"> {/* 25% chiều rộng cho thông tin người dùng */}
+          <UserInfo userId={user_Answers[0]?.userId} />
+        </div>
+
+      </div>
+
+  
+    </main>
+  );
+};
+
+export default MyExam;

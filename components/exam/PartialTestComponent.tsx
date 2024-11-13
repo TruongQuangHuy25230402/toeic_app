@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Result from "./Result";
 import DictionaryPopup from "./dictionary";
-import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp, FaPlus } from "react-icons/fa";
 import {
   Exam,
+  Grammar,
   QuestionPart1,
   QuestionPart2,
   QuestionPart3,
@@ -11,9 +12,12 @@ import {
   QuestionPart5,
   QuestionPart6,
   QuestionPart7,
+  Vocabulary,
 } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import HighlightableText from "../HighlightableAnswer";
+import { Button } from "../ui/button";
+
 
 type Question =
   | QuestionPart1
@@ -23,6 +27,16 @@ type Question =
   | QuestionPart5
   | QuestionPart6
   | QuestionPart7;
+
+  interface User {
+    id :         string;       
+    username :   string;
+    email:       string ;      
+    profilePic:  string;
+    clerkUserId: string ;      
+    
+  
+  }
 
   interface UserAnswerDetail {
     questionId: string; // Hoặc kiểu dữ liệu tương ứng
@@ -43,9 +57,58 @@ type Question =
     numberCorrect: number;
     numberWrong: number;
     numberSkip: number;
+    timeTaken: string;
     createdAt: Date;
     updatedAt: Date;
     userAnswerDetail: UserAnswerDetail[]; // Đảm bảo có thuộc tính này
+  }
+
+  const questionsPerPart = {
+    part1: 2,
+    part2: 4,
+    part3: 6,
+    part4: 10,
+    part5: 14,
+    part6: 12,
+    part7: 20,
+  };
+  
+  function getRandomQuestions(questions: Question[], count: number): Question[] {
+    // Group câu hỏi theo groupId
+    const groupedQuestions = questions.reduce<{ [key: string]: Question[] }>((acc, question) => {
+      const groupId = question.groupId || 'no-group'; // Nếu không có groupId, gán vào group 'no-group'
+      if (!acc[groupId]) {
+        acc[groupId] = [];
+      }
+      acc[groupId].push(question);
+      return acc;
+    }, {});
+  
+    // Chọn các nhóm câu hỏi ngẫu nhiên
+    const groupIds = Object.keys(groupedQuestions);
+    const shuffledGroupIds = [...groupIds].sort(() => Math.random() - 0.5); // Xáo trộn các groupId
+  
+    // Chọn câu hỏi từ nhóm xáo trộn, lấy đủ số lượng câu hỏi cần thiết
+    const selectedQuestions: Question[] = [];
+    let questionsRemaining = count;
+  
+    for (const groupId of shuffledGroupIds) {
+      if (questionsRemaining <= 0) break; // Nếu đã chọn đủ số câu hỏi, dừng lại
+      const group = groupedQuestions[groupId];
+      const groupSize = group.length;
+  
+      if (groupSize <= questionsRemaining) {
+        selectedQuestions.push(...group); // Chọn tất cả câu hỏi trong nhóm
+        questionsRemaining -= groupSize;
+      } else {
+        // Nếu nhóm có nhiều hơn câu hỏi cần thiết, chỉ chọn số câu hỏi còn lại
+        const selectedFromGroup = group.slice(0, questionsRemaining);
+        selectedQuestions.push(...selectedFromGroup);
+        questionsRemaining = 0; // Chọn đủ câu hỏi, dừng lại
+      }
+    }
+  
+    return selectedQuestions;
   }
 
 
@@ -78,7 +141,7 @@ const PartialTestComponent = ({
   }>({});
   const [listeningScore, setListeningScore] = useState(0);
   const [readingScore, setReadingScore] = useState(0);
-
+  const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [skippedAnswersCount, setSkippedAnswersCount] = useState(0);
   const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
@@ -88,7 +151,10 @@ const PartialTestComponent = ({
   const readingParts = [5, 6, 7]; // Reading parts
   const [currentPart, setCurrentPart] = useState(0);
   
-  const questionsPerPart = [6, 25, 39, 30, 30, 16, 54];
+  
+
+
+
   const [userId, setUserId] = useState<string>(''); // Giá trị ban đầu là chuỗi rỗng
   useEffect(() => {
     const interval = setInterval(() => {
@@ -123,39 +189,50 @@ const PartialTestComponent = ({
     fetchUser();
   }, []);
 
+
   
 
-  const selectedQuestions = selectedParts.reduce<Question[]>((acc, part) => {
-    let questions: Question[] = [];
-
-    switch (part) {
-      case 1:
-        questions = exam.part1s as QuestionPart1[];
-        break;
-      case 2:
-        questions = exam.part2s as QuestionPart2[];
-        break;
-      case 3:
-        questions = exam.part3s as QuestionPart3[];
-        break;
-      case 4:
-        questions = exam.part4s as QuestionPart4[];
-        break;
-      case 5:
-        questions = exam.part5s as QuestionPart5[];
-        break;
-      case 6:
-        questions = exam.part6s as QuestionPart6[];
-        break;
-      case 7:
-        questions = exam.part7s as QuestionPart7[];
-        break;
-      default:
-        break;
-    }
-
-    return acc.concat(questions || []);
-  }, []);
+  useEffect(() => {
+    // Hàm để chọn câu hỏi ngẫu nhiên cho tất cả các phần đã chọn
+    const randomQuestions = selectedParts.reduce<Question[]>((acc, part) => {
+      let questions: Question[] = [];
+  
+      switch (part) {
+        case 1:
+          questions = exam.part1s as QuestionPart1[];
+          break;
+        case 2:
+          questions = exam.part2s as QuestionPart2[];
+          break;
+        case 3:
+          questions = exam.part3s as QuestionPart3[];
+          break;
+        case 4:
+          questions = exam.part4s as QuestionPart4[];
+          break;
+        case 5:
+          questions = exam.part5s as QuestionPart5[];
+          break;
+        case 6:
+          questions = exam.part6s as QuestionPart6[];
+          break;
+        case 7:
+          questions = exam.part7s as QuestionPart7[];
+          break;
+        default:
+          break;
+      }
+  
+      const numberOfQuestionsToSelect = questionsPerPart[`part${part}` as keyof typeof questionsPerPart];
+      const selected = getRandomQuestions(questions, numberOfQuestionsToSelect);
+  
+      return acc.concat(selected);
+    }, []);
+  
+    // Cập nhật trạng thái với câu hỏi đã chọn
+    setSelectedQuestions(randomQuestions);
+  
+  }, [selectedParts, exam]); // Chỉ gọi khi `selectedParts` hoặc `exam` thay đổi
 
   const [isAtTop, setIsAtTop] = useState(true);
 
@@ -178,6 +255,7 @@ const PartialTestComponent = ({
     };
   }, []);
 
+  
   const partForQuestion = (question: Question): number => {
     if (exam.part1s.includes(question as QuestionPart1)) return 1;
     if (exam.part2s.includes(question as QuestionPart2)) return 2;
@@ -191,15 +269,25 @@ const PartialTestComponent = ({
 
   
 
-// Tính toán các câu hỏi thuộc phần hiện tại
-const startIndex = selectedParts
-  .slice(0, currentPart) // Lấy các phần đã chọn cho đến phần hiện tại
-  .reduce((acc, curr) => acc + questionsPerPart[curr - 1], 0); // curr - 1 vì selectedParts bắt đầu từ 1
+  // Tính toán chỉ mục và số lượng câu hỏi cho phần thi hiện tại
+  const startIndex = selectedParts
+    .slice(0, currentPart) // Lấy các phần đã chọn cho đến phần hiện tại
+    .reduce((acc, curr) => acc + questionsPerPart[`part${curr}` as keyof typeof questionsPerPart], 0);
 
-const count = questionsPerPart[selectedParts[currentPart] - 1]; // Lấy số lượng câu hỏi cho phần hiện tại
+  const count = questionsPerPart[`part${selectedParts[currentPart]}` as keyof typeof questionsPerPart];
 
-// Lấy câu hỏi cho phần hiện tại
-const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
+  // Lấy câu hỏi cho phần hiện tại
+  const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
+
+  // Track visibility of explanations for each question
+  const [visibleExplanations, setVisibleExplanations] = useState<{ [key: string]: boolean }>({});
+
+  const toggleExplanation = (questionId: string) => {
+    setVisibleExplanations((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId],
+    }));
+  };
 
 
 
@@ -209,7 +297,21 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
     let correctCount = 0;
     let skippedCount = 0;
     let wrongCount = 0;
-    setTimeTaken(timeLimit * 60 - timeRemaining);
+    
+    // Tính thời gian đã sử dụng
+    const timeTakenSeconds = 120 * 60 - timeRemaining;
+
+// Hàm chuyển đổi giây sang định dạng HH:mm:ss
+const formatTime = (seconds: number): string => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+// Định dạng timeTaken
+const formattedTimeTaken = formatTime(timeTakenSeconds);
+
     // Tạo một đối tượng UserAnswer để lưu thông tin
     const userAnswerData: UserAnswer = {
       userId: userId, // Thêm userId vào đây
@@ -220,6 +322,7 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
       numberCorrect: correctCount,
       numberWrong: wrongCount,
       numberSkip: skippedCount,
+      timeTaken: formattedTimeTaken, // Thêm timeTaken vào đây
       createdAt: new Date(),
       updatedAt: new Date(),
       userAnswerDetail: [],
@@ -322,12 +425,14 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
 
     
   };
+
   
 
   
   return (
     <div className="flex">
       <div className="w-4/5 p-4 bg-white rounded-lg">
+      
         <div className="mb-4">
           {selectedParts.map((part, index) => (
             <button
@@ -341,169 +446,165 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
         </div>
           
         {partQuestions.length === 0 ? (
-  <p>Không có câu hỏi nào được chọn.</p>
-) : (
-  (() => {
-    const groupedQuestions: { [key: string]: any[] } = {};
+        <p>Không có câu hỏi nào được chọn.</p>
+      ) : (
+        (() => {
+          const groupedQuestions: { [key: string]: any[] } = {};
 
-    // Organize questions by groupId
-    partQuestions.forEach((question) => {
-      const groupId = question.groupId || "ungrouped"; // Use "ungrouped" for questions without a groupId
+          // Organize questions by groupId
+          partQuestions.forEach((question) => {
+            const groupId = question.groupId || 'ungrouped';
+            if (!groupedQuestions[groupId]) {
+              groupedQuestions[groupId] = [];
+            }
+            groupedQuestions[groupId].push(question);
+          });
 
-      if (!groupedQuestions[groupId]) {
-        groupedQuestions[groupId] = [];
-      }
-      groupedQuestions[groupId].push(question);
-    });
+          const groupIds = Object.keys(groupedQuestions);
+          let overallIndex = startIndex;
 
-    const groupIds = Object.keys(groupedQuestions);
+          return groupIds.map((groupId) => {
+            const questionsInGroup = groupedQuestions[groupId];
+            if (groupId === 'ungrouped') {
+              return questionsInGroup.map((question) => {
+                const currentIndex = overallIndex++;
+                const images = [question.imageFile, question.imageFile2, question.imageFile3].filter(Boolean);
 
-    let overallIndex = startIndex; // Start from the overall start index
-
-    return groupIds.map((groupId) => {
-      const questionsInGroup = groupedQuestions[groupId];
-
-      // Check if it's an ungrouped question or a group
-      if (groupId === "ungrouped") {
-        // Render ungrouped questions individually
-        return questionsInGroup.map((question) => {
-          const currentIndex = overallIndex++; // Use and increment the overall index
-          const images = [
-            question.imageFile,
-            question.imageFile2,
-            question.imageFile3,
-          ].filter(Boolean);
-
-          return (
-            <div key={question.id} className="mb-4">
-              {images.length > 0 && (
-                <div
-                  className="flex-shrink-0 overflow-y-auto space-y-2 mb-2"
-                  style={{ maxHeight: '500px' }} // Set max height for scrolling
-                >
-                  {images.map((imageFile: string, index: number) => (
-                    <img
-                      key={index}
-                      src={imageFile}
-                      alt={`Hình ảnh ${index + 1}`}
-                      className="mb-2 rounded"
-                      style={{ width: '500px', height: 'auto' }}
-                    />
-                  ))}
-                </div>
-              )}
-              
-              <strong>Câu hỏi {currentIndex + 1}</strong>
-              {question.audioFile && (
-                <audio controls className="my-2">
-                  <source src={question.audioFile} type="audio/mpeg" />
-                  Trình duyệt của bạn không hỗ trợ phát âm thanh.
-                </audio>
-              )}
-              <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '2' }}>
-                {question.questionText || ""}
-              </h3>
-              
-
-              {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
-                const answer = (question as any)[answerKey];
-                return answer ? (
-                  <label className="block" key={answerKey}>
-                    <input
-                      type="radio"
-                      name={`question-${question.id}`}
-                      checked={selectedAnswers[question.id] === answer}
-                      onChange={() =>
-                        setSelectedAnswers((prev) => ({
-                          ...prev,
-                          [question.id]: answer,
-                        }))
-                      }
-                    />
-                    {answer}
-                  </label>
-                ) : null;
-              })}
-            </div>
-          );
-        });
-      } else {
-        // Render grouped questions in a single box
-        const images = [
-          questionsInGroup[0]?.imageFile,
-          questionsInGroup[0]?.imageFile2,
-          questionsInGroup[0]?.imageFile3,
-        ].filter(Boolean);
-
-        return (
-          <div key={groupId} className="mb-4">
-            <div className="flex my-4 bg-gray-100 border p-2 rounded">
-              {images.length > 0 && (
-                <div
-                  className="flex-shrink-0 overflow-y-auto space-y-2"
-                  style={{ maxHeight: '400px' }} // Set max height for scrolling
-                >
-                  {images.map((imageFile: string, index: number) => (
-                    <img
-                      key={index}
-                      src={imageFile}
-                      alt={`Hình ảnh ${index + 1} của nhóm câu hỏi ${groupId}`}
-                      className="mb-2 rounded"
-                      style={{ width: '500px', height: 'auto' }}
-                    />
-                  ))}
-                </div>
-              )}
-              
-              <div className="flex-grow overflow-y-auto max-h-60 ml-4">
-                {questionsInGroup.map((question) => {
-                  const currentIndex = overallIndex++; // Use and increment the overall index
-
-                  return (
-                    <div key={question.id} className="my-2">
-                      <div className="mt-2">
-                        <strong>Câu hỏi {currentIndex + 1}</strong>
+                return (
+                  <div key={question.id} className="mb-4">
+                    {images.length > 0 && (
+                      <div className="flex-shrink-0 overflow-y-auto space-y-2 mb-2" style={{ maxHeight: '500px' }}>
+                        {images.map((imageFile: string, index: number) => (
+                          <img key={index} src={imageFile} alt={`Hình ảnh ${index + 1}`} className="mb-2 rounded" style={{ width: '500px', height: 'auto' }} />
+                        ))}
                       </div>
-                      <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '1.5' }}>
-                        {question.questionText || ""}
-                      </h3>
-                      {question.audioFile && (
-                <audio controls className="my-2">
-                  <source src={question.audioFile} type="audio/mpeg" />
-                  Trình duyệt của bạn không hỗ trợ phát âm thanh.
-                </audio>
-              )}
+                    )}
+                    <strong>Câu hỏi {currentIndex + 1}</strong>
+                    {question.audioFile && (
+                      <audio controls className="my-2">
+                        <source src={question.audioFile} type="audio/mpeg" />
+                        Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                      </audio>
+                    )}
+                    <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '2' }}>
+                      {question.questionText || ''}
+                    </h3>
 
-                      {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
-                        const answer = (question as any)[answerKey];
-                        return answer ? (
-                          <label className="block" key={answerKey}>
-                            <input
-                              type="radio"
-                              name={`question-${question.id}`}
-                              checked={selectedAnswers[question.id] === answer}
-                              onChange={() =>
-                                setSelectedAnswers((prev) => ({
-                                  ...prev,
-                                  [question.id]: answer,
-                                }))
-                              }
-                            />
-                            {answer}
-                          </label>
-                        ) : null;
+                    {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
+                      const answer = (question as any)[answerKey];
+                      return answer ? (
+                        <label className="block" key={answerKey}>
+                          <input
+                            type="radio"
+                            name={`question-${question.id}`}
+                            checked={selectedAnswers[question.id] === answer}
+                            onChange={() =>
+                              setSelectedAnswers((prev) => ({
+                                ...prev,
+                                [question.id]: answer,
+                              }))
+                            }
+                          />
+                          {answer}
+                        </label>
+                      ) : null;
+                    })}
+
+                    {/* Toggle explanation button */}
+                    <button onClick={() => toggleExplanation(question.id)} className="mt-2 text-blue-500">
+                      {visibleExplanations[question.id] ? 'Ẩn transcript' : 'Hiện transcript'}
+                    </button>
+
+                    {/* Explanation display */}
+                    {visibleExplanations[question.id] && (
+                      <p className="mt-2 p-2 bg-gray-100 rounded">{question.explainAnswer}</p>
+                    )}
+                  </div>
+                );
+              });
+            } else {
+              const images = [
+                questionsInGroup[0]?.imageFile,
+                questionsInGroup[0]?.imageFile2,
+                questionsInGroup[0]?.imageFile3,
+              ].filter(Boolean);
+
+              return (
+                <div key={groupId} className="mb-4">
+                  <div className="flex my-4 bg-gray-100 border p-2 rounded">
+                    {images.length > 0 && (
+                      <div className="flex-shrink-0 overflow-y-auto space-y-2" style={{ maxHeight: '400px' }}>
+                        {images.map((imageFile: string, index: number) => (
+                          <img
+                            key={index}
+                            src={imageFile}
+                            alt={`Hình ảnh ${index + 1} của nhóm câu hỏi ${groupId}`}
+                            className="mb-2 rounded"
+                            style={{ width: '500px', height: 'auto' }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex-grow overflow-y-auto max-h-60 ml-4">
+                      {questionsInGroup.map((question) => {
+                        const currentIndex = overallIndex++;
+
+                        return (
+                          <div key={question.id} className="my-2">
+                            <div className="mt-2">
+                              <strong>Câu hỏi {currentIndex + 1}</strong>
+                            </div>
+                            <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '1.5' }}>
+                              {question.questionText || ''}
+                            </h3>
+                            {question.audioFile && (
+                              <audio controls className="my-2">
+                                <source src={question.audioFile} type="audio/mpeg" />
+                                Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                              </audio>
+                            )}
+
+                            {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
+                              const answer = (question as any)[answerKey];
+                              return answer ? (
+                                <label className="block" key={answerKey}>
+                                  <input
+                                    type="radio"
+                                    name={`question-${question.id}`}
+                                    checked={selectedAnswers[question.id] === answer}
+                                    onChange={() =>
+                                      setSelectedAnswers((prev) => ({
+                                        ...prev,
+                                        [question.id]: answer,
+                                      }))
+                                    }
+                                  />
+                                  {answer}
+                                </label>
+                              ) : null;
+                            })}
+
+                            {/* Toggle explanation button */}
+                            <button onClick={() => toggleExplanation(question.id)} className="mt-2 text-blue-500">
+                              {visibleExplanations[question.id] ? 'Ẩn transcript' : 'Hiện transcript'}
+                            </button>
+
+                            {/* Explanation display */}
+                            {visibleExplanations[question.id] && (
+                              <p className="mt-2 p-2 bg-gray-100 rounded">{question.explainAnswer}</p>
+                            )}
+                          </div>
+                        );
                       })}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      }
-    });
-  })()
-)}
+                  </div>
+                </div>
+              );
+            }
+          });
+        })()
+      )}
+
 
 
         {/* Nút Trang Tiếp Theo */}
@@ -537,17 +638,18 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
         <h3 className="mt-4 font-bold">Trạng thái câu hỏi đã chọn:</h3>
 
         {selectedParts.map((part, index) => {
-  // Calculate start index by summing up only selected parts' question counts before this part
+  // Tính toán chỉ mục bắt đầu cho phần hiện tại
   const startIndex = selectedParts
-    .slice(0, index)
-    .reduce((acc, currPart) => acc + questionsPerPart[currPart - 1], 0);
+    .slice(0, index) // Lấy các phần đã chọn trước phần hiện tại
+    .reduce((acc, currPart) => {
+      return acc + questionsPerPart[`part${currPart}` as keyof typeof questionsPerPart]; // Cộng số lượng câu hỏi của các phần trước
+    }, 0);
 
-  // Get the count for the current part
-  const count = questionsPerPart[part - 1];
-  const partQuestions = selectedQuestions.slice(
-    startIndex,
-    startIndex + count
-  );
+  // Lấy số câu hỏi cho phần hiện tại
+  const count = questionsPerPart[`part${part}` as keyof typeof questionsPerPart];
+
+  // Lấy câu hỏi cho phần hiện tại từ selectedQuestions
+  const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
 
   return (
     <div key={part} className="mt-2">
@@ -556,11 +658,9 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
         {partQuestions.map((question, i) => (
           <div
             key={question.id}
-            className={`w-6 h-6 rounded-full mr-2 mb-2 ${
-              selectedAnswers[question.id] ? "bg-blue-500" : "bg-gray-300"
-            }`}
+            className={`w-6 h-6 rounded-full mr-2 mb-2 ${selectedAnswers[question.id] ? "bg-blue-500" : "bg-gray-300"}`}
             onClick={() => {
-              setCurrentPart(part - 1); // Navigate to the corresponding part
+              setCurrentPart(part - 1); // Chuyển đến phần tương ứng
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             style={{ cursor: "pointer" }}
@@ -577,30 +677,43 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
 
 
 
+
+
+
         <button
           onClick={handleSubmit}
           className="mt-4 p-2 bg-blue-500 text-white rounded"
         >
           Nộp Bài
         </button>
+        
       </div>
 
       <div className="fixed bottom-10 right-10 flex flex-col items-center">
         {/* DictionaryPopup luôn hiển thị */}
         <div className="mb-2">
+          
           <DictionaryPopup />
         </div>
 
+        
+
+    
+
+    
+      
+        
         {/* Nút cuộn lên chỉ hiển thị khi người dùng không ở đầu trang */}
         {!isAtTop && (
-          <button
+          <Button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="p-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
           >
             <FaArrowUp className="w-6 h-6" />
-          </button>
+          </Button>
         )}
       </div>
+      
     </div>
   );
 };

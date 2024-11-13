@@ -45,6 +45,8 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
   // State để theo dõi số lần làm đề thi
   const [testAttemptCount, setTestAttemptCount] = useState<number>(0);
 
+  const [hasTwoExams, setHasTwoExams] = useState(false);
+
   const [topics, setTopics] = useState<TopicsState>({
     part1s: [],
     part2s: [],
@@ -129,6 +131,21 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
     fetchTopics();
   }, []);
 
+  useEffect(() => {
+    const fetchExamData = async () => {
+    
+      try {
+        const response = await fetch(`/api/check?examId=${exam.id}`);
+        const data = await response.json();
+        setHasTwoExams(data.hasTwoExams); // Set the state based on response
+      } catch (error) {
+        console.error("Error fetching user answer data:", error);
+      }
+    };
+
+    fetchExamData();
+  }, [exam.id]);
+
   const handleBack = () => {
     if (testStarted) {
       const confirmLeave = window.confirm(
@@ -140,6 +157,7 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
     }
     router.back();
   };
+
 
   return (
     <div className="flex flex-col gap-6 pb-2">
@@ -161,16 +179,7 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
             >
               Thông tin đề thi
             </button>
-            <button
-              className={`py-2 px-4 rounded ${
-                selectedTab === "answers"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
-              }`}
-              onClick={() => handleTabChange("answers")}
-            >
-              Đáp án chi tiết
-            </button>
+            
           </div>
 
           {/* Hiển thị nội dung dựa trên tab đã chọn */}
@@ -343,12 +352,7 @@ const ExamDetailClient = ({ exam }: { exam: ExamWithParts }) => {
             />
           )}
 
-          <button
-            className="py-2 px-4 bg-red-500 text-white rounded mt-4"
-            onClick={handleBack}
-          >
-            Quay lại
-          </button>
+          
         </div>
       )}
     </div>

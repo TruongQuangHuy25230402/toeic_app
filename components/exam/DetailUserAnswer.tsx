@@ -84,7 +84,9 @@ const DetailUserAnswer = ({ userId }: DetailUserAnswerProps) => {
                                     <td className="border border-gray-300 px-4 py-2">{userAnswer.numberCorrect}</td>
                                     <td className="border border-gray-300 px-4 py-2">{userAnswer.numberWrong}</td>
                                     <td className="border border-gray-300 px-4 py-2">{userAnswer.numberSkip}</td>
-                                    <td className="border border-gray-300 px-4 py-2">{new Date(userAnswer.createdAt).toLocaleString()}</td>
+                                    <td className="border border-gray-300 px-4 py-2">
+    {new Date(userAnswer.createdAt).toLocaleDateString('en-GB')} || {new Date(userAnswer.createdAt).toLocaleTimeString()}
+</td>
                                     <td className="border border-gray-300 px-4 py-2 cursor-pointer" onClick={() => router.push(`/userAnswer/${userAnswer.id}`)}>Chi tiết</td>
                                 </tr>
                             ))

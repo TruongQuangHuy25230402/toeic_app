@@ -28,6 +28,8 @@ function LayoutProvider({
 
   const isCourseRoute = pathname.startsWith("/course");
 
+  const isQuesRoute = pathname.startsWith("/ques");
+
   // Xác định nếu là trang chủ
   const isHomePage = pathname === "/";
 
@@ -58,9 +60,26 @@ function LayoutProvider({
     );
   }
 
+   // Layout riêng cho trang /exam
+   if (isQuesRoute) {
+    return (
+      <div className="min-h-screen w-full flex flex-col bg-exam-background">
+        <header className="w-full">
+          {/* Nếu cần có header riêng cho trang exam */}
+        </header>
+        <main className="flex-grow w-full p-4">
+          {children}
+        </main>
+        <footer className="w-full">
+          {/* Nếu cần có footer riêng cho trang exam */}
+        </footer>
+      </div>
+    );
+  }
+
   // Hàm lấy Navbar - chỉ bỏ qua /admin và /exam
   const getNavbar = () => {
-    if (isAdminRoute || isExamRoute || isUploadRoute) return null;
+    if (isAdminRoute || isExamRoute || isUploadRoute || isQuesRoute) return null;
     return (
       <div className="fixed top-0 left-0 right-0 z-50">
         <Navbar />
@@ -70,7 +89,7 @@ function LayoutProvider({
 
   // Hàm lấy Footer - chỉ bỏ qua /admin và /exam
   const getFooter = () => {
-    if (isAdminRoute || isExamRoute || isUploadRoute || isLMSRoute || isCourseRoute) return null;
+    if (isAdminRoute || isExamRoute || isUploadRoute || isLMSRoute || isCourseRoute || isQuesRoute) return null;
     return <Footer />;
   };
 

@@ -26,9 +26,12 @@ export default function Page() {
   }, []);
 
   return (
-    <div>
-      <PageTitle title="Users" />
-      <DataTable columns={columns} data={data} />
-    </div>
+
+<div className="container mx-auto py-10">
+<div className="flex justify-between items-center mb-4">
+  <PageTitle title="Users"/>
+</div>
+<DataTable columns={columns} data={data} />
+</div>
   );
 }

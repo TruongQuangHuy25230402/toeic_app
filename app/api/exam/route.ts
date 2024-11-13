@@ -21,13 +21,6 @@ export async function GET() {
     try {
         const exams = await prisma.exam.findMany({
             include: {
-                part1s: true,
-                part2s: true,
-                part3s: true,
-                part4s: true,
-                part5s: true,
-                part6s: true,
-                part7s: true,
                 userAnswers: true
             },
         });

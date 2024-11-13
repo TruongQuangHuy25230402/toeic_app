@@ -1,5 +1,6 @@
 import { getUserId } from '@/actions/getUserId';
 import DetailUserAnswer from '@/components/exam/DetailUserAnswer';
+import DetailAnswer from '@/components/exams/DetailAnswer';
 import UserInfo from '@/components/user/UserInfo';
 import React from 'react';
 
@@ -12,15 +13,19 @@ interface UserPageProps {
 const User = async ({ params }: UserPageProps) => {
     const user = await getUserId(params.userId);
 
-    if (!user) {
+    if (!user || 'message' in user) {
         return <div>User not found</div>;
     }
 
     return (
         <div>
             <UserInfo userId={user.id}/>
+
             {/* Pass userId as prop to DetailUserAnswer */}
-            <DetailUserAnswer userId={user.id} />
+            
+            <DetailAnswer userId={user.id}/>
+
+            
             
         </div>
     );

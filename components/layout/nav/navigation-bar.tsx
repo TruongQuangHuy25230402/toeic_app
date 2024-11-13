@@ -66,7 +66,20 @@ const NavigationBar = () => {
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Chương trình học
+              Trang chủ
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link
+            href="/list-exams"
+            className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
+            legacyBehavior
+            passHref
+          >
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Luyện thi
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
@@ -79,7 +92,7 @@ const NavigationBar = () => {
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Đề thi online
+              Luyện thi ngẫu nhiên
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
@@ -92,27 +105,14 @@ const NavigationBar = () => {
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Flashcards
+              Chat
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
           <Link
-            href="/"
-            className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
-            legacyBehavior
-            passHref
-          >
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Blog
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <Link
-            href="/"
+            href="/lms"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior
             passHref

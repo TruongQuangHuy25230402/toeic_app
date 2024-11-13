@@ -55,7 +55,8 @@ const ExamCard = ({ exam }: { exam: ExamWithParts }) => {
     >
       <div className="flex flex-col gap-2 bg-background/50 border border-primary/10 rounded-lg p-4 w-full">
         {/* Tiêu đề */}
-        <h3 className="font-semibold text-base">{exam.title}</h3>
+        <h3 className="font-semibold text-sm truncate">{exam.title}</h3>
+
 
         {/* Thời gian làm bài */}
         <div className="text-primary/90 text-sm flex items-center gap-2">
@@ -64,7 +65,7 @@ const ExamCard = ({ exam }: { exam: ExamWithParts }) => {
 
         {/* Số người đã làm */}
         <div className="text-primary/90 text-sm flex items-center gap-2">
-          <Users size={20} /> {exam.userAnswers?.length || 0} người
+          <Users size={20} /> {exam.userAnswers?.length || 0} lượt làm bài
         </div>
 
         {/* 7 phần thi */}

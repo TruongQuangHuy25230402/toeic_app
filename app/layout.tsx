@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Raleway } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import LayoutProvider from "../providers/LayoutProvider";
 import { ThemeProvider } from "next-themes";
 import { cn } from "@/lib/utils";
 
-const raleway = Raleway({
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "900"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
       <html lang="en">
         <body
           className={cn(
-            raleway.className,
+            roboto.className, // Apply Inter font
             "min-h-screen w-full bg-white text-black flex",
             process.env.NODE_ENV === "development" && "debug-screens"
           )}

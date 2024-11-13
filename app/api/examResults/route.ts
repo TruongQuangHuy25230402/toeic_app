@@ -21,18 +21,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // Cập nhật participantCount cho exam tương ứng
-    await prisma.exam.update({
-      where: {
-        id: body.examId,
-      },
-      data: {
-        participantCount: {
-          increment: 1, // Tăng participantCount lên 1
-        },
-      },
-    });
-
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error saving exam result:", error);

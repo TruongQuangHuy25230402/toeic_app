@@ -11,7 +11,8 @@ import {
   LayoutDashboard,
   UsersRound,
   Settings,
-  ChevronRight
+  ChevronRight,
+  BookOpenCheck,
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -56,9 +57,21 @@ export default function SideNavbar({}: Props) {
             variant: "ghost"
           },
           {
-            title: "Quiz",
-            href: "/admin/quiz",
-            icon: ShoppingCart,
+            title: "Exam",
+            href: "/admin/exams",
+            icon: BookOpenCheck,
+            variant: "ghost"
+          },
+          {
+            title: "Test",
+            href: "/admin/exam",
+            icon: BookOpenCheck,
+            variant: "ghost"
+          },
+          {
+            title: "Question",
+            href: "/admin/question",
+            icon: BookOpenCheck,
             variant: "ghost"
           },
           {

@@ -26,6 +26,8 @@ const Quiz = ({ questions, userId }: QuizProps) => {
   const [timeRemaining, setTimeRemaining] = useState(25); // thời gian trả lời câu hỏi
   const [timerRunning, setTimerRunning] = useState(false); // xác định bố đếm chạy
 
+  console.log("questions", questions)
+
   const { question, answers, correctAnswer } =
     questions[activeQuestion];// Lấy câu hỏi, câu trả lời, từ câu hỏi hiện tại
 

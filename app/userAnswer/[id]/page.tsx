@@ -14,7 +14,10 @@ interface UserPageProps {
 const UserAnswer = async ({ params }: UserPageProps) => {
   const userAnswer = await getUserById(params.id);
 
-  const formattedDate = userAnswer?.updatedAt?.toLocaleDateString() ?? "";
+  console.log("UserAnswer", userAnswer); // Check the value of userAnswer
+console.log("UserAnswerId", userAnswer ? userAnswer.id : "No user answer found");
+
+  const formattedDate = userAnswer?.timeTaken
 
 
   return (
@@ -78,14 +81,13 @@ const UserAnswer = async ({ params }: UserPageProps) => {
                       <p className="mt-2">Số điểm: <strong>{userAnswer.scoreReading}</strong></p>
                     </div>
                   </div>
+                
                 </div>
               </div>
+          
               {/* User Answer Detail */}
               <h1> Thống kê kết quả </h1>
-              <UserAnswerDetail
-            exam={userAnswer.exam}
-            userAnswerDetail={userAnswer.UserAnswerDetail || []}
-          />
+              <UserAnswerDetail />
             </div>
 
             {/* 20% Left Panel with UserInfo */}

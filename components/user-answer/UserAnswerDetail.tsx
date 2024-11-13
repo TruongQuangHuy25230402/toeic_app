@@ -1,303 +1,116 @@
-"use client";
+"use client"
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 
-import React, { useEffect, useState } from "react";
-
-import * as z from "zod";
-
-import {
-  Exam,
-  QuestionPart1,
-  QuestionPart2,
-  QuestionPart3,
-  QuestionPart4,
-  QuestionPart5,
-  QuestionPart6,
-  QuestionPart7,
-  TopicPart1,
-  UserAnswer,
-  UserAnswerDetail,
-} from "@prisma/client";
-
-
-import {
-  Form,
- 
-} from "../ui/form";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-
-import { useForm } from "react-hook-form";
-
-import { Separator } from "../ui/separator";
-
-
-import apiClient from "@/lib/api-client";
-import { USER_API_ROUTES } from "@/ultis/api-route";
-import Arr1 from "../part1-answer/Arr1";
-import Arr2 from "../part2-answer/Arr2";
-import Arr3 from "../part3-answer/Arr3";
-import Arr4 from "../part4-answer/Arr4";
-import Arr5 from "../part5-answer/Arr5";
-import Arr6 from "../part6-answer/Arr6";
-import Arr7 from "../part7-answer/Arr7";
-
-interface UserAnswerFormProps {
-  exam: ExamWithParts | null;
-  userAnswerDetail: UserAnswerDetail[];
-}
-
-export type ExamWithParts = Exam & {
-  part1s: QuestionPart1[];
-  part2s: QuestionPart2[];
-  part3s: QuestionPart3[];
-  part4s: QuestionPart4[];
-  part5s: QuestionPart5[];
-  part6s: QuestionPart6[];
-  part7s: QuestionPart7[];
-  
-};
-
-const formSchema = z.object({
-  title: z.string().min(3, {
-    message: "Description must be atleast 3 characters long",
-  }),
-  description: z.string().min(10, {
-    message: "Description must be atleast 10 characters long",
-  }),
-  audioFile: z.string().min(1, { message: "Audio is required" }),
-});
-
-const UserAnswerDeltail = ({ exam, userAnswerDetail }: UserAnswerFormProps) => {
-  const [topics, setTopics] = useState<TopicPart1[]>([]);
-
-  const [details, setDetails] = useState<UserAnswerDetail[]>([]);
-
-  type PartType =
-    | "part1"
-    | "part2"
-    | "part3"
-    | "part4"
-    | "part5"
-    | "part6"
-    | "part7"; // Ví dụ về các giá trị cụ thể
-
-  // Đối với từng part khi nhấn vào thì sẽ là 1 form nhập liệu cho từng part
-  const [openDialog, setOpenDialog] = useState<PartType | null>(null);
-
-  // Ứng với từng part của exam thì sẽ có dialog để nhập dữ liệu riêng
-  const handleDialogOpen = (part: PartType) => {
-    setOpenDialog((prev) => (prev === part ? null : part));
-  };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: exam || {
-      title: "",
-      description: "",
-      audioFile: "",
-    },
-  });
+const UserAnswerDetail = () => {
+  const [userAnswer, setUserAnswer] = useState<any>(null);
+  const [UserAnswerDetail, setUserAnswerDetail] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { id } = useParams();
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const response = await apiClient.get(USER_API_ROUTES.GET_DETAIL);
-        console.log("API Response:", response.data); // Log the entire response
+    if (id) {
+      fetch(`/api/userAnswers/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setUserAnswer(data);
+          setUserAnswerDetail(data.UserAnswerDetail || []);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching user answer:', error);
+          setLoading(false);
+        });
+    }
+  }, [id]);
 
-        if (response.data.details) {
-          setDetails(response.data.details); // Correctly set the topics array
-        }
-      } catch (error) {
-        console.error("Error fetching details:", error);
-      }
-    };
-
-    fetchDetails();
-  }, []);
-
-
-
-  function onSubmit(values: z.infer<typeof formSchema>){
-    
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-600">
+        Loading...
+      </div>
+    );
   }
 
-
+  if (!userAnswer || UserAnswerDetail.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-600">
+        No user answer details found.
+      </div>
+    );
+  }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="w-full md:w-[100%] flex flex-col gap-6">
-          {exam && !!exam.part1s.length && (
-            <div>
-              <h3>Part 1</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part1s.map((part1, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part1.id) || null;
+    <div className="container mx-auto p-4">
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+        Answer Details
+      </h2>
+      <div className="space-y-4">
+        {UserAnswerDetail.map((detail: any, index: number) => {
+          // Find the correct question part based on `questionId`
+          const questionPart = 
+            detail.questionPart1?.id === detail.questionId ? detail.questionPart1 :
+            detail.questionPart2?.id === detail.questionId ? detail.questionPart2 :
+            detail.questionPart3?.id === detail.questionId ? detail.questionPart3 :
+            detail.questionPart4?.id === detail.questionId ? detail.questionPart4 :
+            detail.questionPart5?.id === detail.questionId ? detail.questionPart5 :
+            detail.questionPart6?.id === detail.questionId ? detail.questionPart6 :
+            detail.questionPart7?.id === detail.questionId ? detail.questionPart7 :
+            null;
 
-      return (
-        <Arr1
-          key={part1.id}
-          exam={exam}
-          part1={part1}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
+          return (
+            <div key={detail.id} className="p-6 bg-white rounded-lg shadow-md">
+              {questionPart ? (
+                <>
+                  <p className="text-lg font-semibold text-gray-700">
+                    Câu số: {index + 1} ||
+                    Question: {questionPart.questionText || 'N/A'}
+                  </p>
+                  {questionPart.imageFile && (
+                    <img src={questionPart.imageFile} alt="Question Image" className="w-1/2 max-w-xs h-auto mt-2 rounded-md" />
+
+                  )}
+                  {questionPart.audioFile && (
+                    <audio controls className="w-full mt-2">
+                      <source src={questionPart.audioFile} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
+                  <div className="mt-4">
+                    <h4 className="text-lg font-semibold text-gray-800">Answer Options:</h4>
+                    <ul className="list-disc list-inside text-gray-700">
+                      <li>{questionPart.answer1 || 'N/A'}</li>
+                      <li>{questionPart.answer2 || 'N/A'}</li>
+                      <li>{questionPart.answer3 || 'N/A'}</li>
+                      <li>{questionPart.answer4 || 'N/A'}</li>
+                    </ul>
+                  </div>
+                  {questionPart.explainAnswer && (
+                    <div className="mt-4">
+                      <h4 className="text-lg font-semibold text-gray-800">Explanation:</h4>
+                      <p className="text-gray-700">{questionPart.explainAnswer}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-gray-700">Question details not found.</p>
+              )}
+
+              <p className="text-lg text-gray-700 mt-4">
+                <span className="font-semibold">Selected Answer:</span> {detail.selectedAnswer}
+              </p>
+              <p className="text-lg text-gray-700">
+                <span className="font-semibold">Is Correct:</span> {detail.isCorrect ? 'Yes' : 'No'}
+              </p>
+              <p className="text-lg text-gray-700">
+                <span className="font-semibold">Skipped:</span> {detail.isSkipped ? 'Yes' : 'No'}
+              </p>
             </div>
-          )}
-
-{exam && !!exam.part2s.length && (
-            <div>
-              <h3>Part 2</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part2s.map((part2, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part2.id) || null;
-
-      return (
-        <Arr2
-          key={part2.id}
-          exam={exam}
-          part2={part2}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
-            </div>
-          )}
-
-{exam && !!exam.part3s.length && (
-            <div>
-              <h3>Part 3</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part3s.map((part3, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part3.id) || null;
-
-      return (
-        <Arr3
-          key={part3.id}
-          exam={exam}
-          part3={part3}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
-            </div>
-          )}
-
-{exam && !!exam.part4s.length && (
-            <div>
-              <h3>Part 4</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part4s.map((part4, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part4.id) || null;
-
-      return (
-        <Arr4
-          key={part4.id}
-          exam={exam}
-          part4={part4}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
-            </div>
-          )}
-
-{exam && !!exam.part5s.length && (
-            <div>
-              <h3>Part 5</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part5s.map((part5, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part5.id) || null;
-
-      return (
-        <Arr5
-          key={part5.id}
-          exam={exam}
-          part5={part5}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
-            </div>
-          )}
-
-{exam && !!exam.part6s.length && (
-            <div>
-              <h3>Part 6</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part6s.map((part6, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part6.id) || null;
-
-      return (
-        <Arr6
-          key={part6.id}
-          exam={exam}
-          part6={part6}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
-            </div>
-          )}
-
-{exam && !!exam.part7s.length && (
-            <div>
-              <h3>Part 7</h3>
-              <Separator />
-              <div className="grid grid-cols-3 gap-4">
-              {exam.part7s.map((part7, index) => {
-      // Find the answer for the current part1 based on questionId
-      const userAnswerDetail = details.find(detail => detail.questionId === part7.id) || null;
-
-      return (
-        <Arr7
-          key={part7.id}
-          exam={exam}
-          part7={part7}
-          index={index} // Pass the index correctly
-          topics={topics}
-          userAnswerDetail={userAnswerDetail} // Pass the corresponding userAnswerDetail
-        />
-      );
-    })}
-              </div>
-            </div>
-          )}
-        </div>
-      </form>
-    </Form>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
-export default UserAnswerDeltail;
+export default UserAnswerDetail;

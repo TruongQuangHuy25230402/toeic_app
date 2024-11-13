@@ -16,6 +16,7 @@ export async function POST(req: Request) {
         numberCorrect: body.numberCorrect,
         numberWrong: body.numberWrong,
         numberSkip: body.numberSkip,
+        timeTaken: body.timeTaken,
         createdAt: new Date(),
         updatedAt: new Date(),
         UserAnswerDetail: {
@@ -28,15 +29,7 @@ export async function POST(req: Request) {
     console.log("Updating participantCount for examId:", body.examId);
 
     // Cập nhật số lượng người làm bài cho Exam
-    await prisma.exam.update({
-      where: { id: body.examId },
-      data: {
-        participantCount: {
-          increment: 1, // Tăng số lượng người làm bài lên 1
-        },
-      },
-    });
-    console.log("Updated participantCount successfully");
+    
 
     return NextResponse.json(result);
   } catch (error) {
@@ -47,7 +40,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id"); // Lấy id từ query params
+  const id = searchParams.get("id"); // Retrieve 'id' from query params
 
   if (!id) {
     return NextResponse.json({ message: "ID is required" }, { status: 400 });
@@ -55,9 +48,9 @@ export async function GET(req: Request) {
 
   try {
     const userAnswer = await prisma.userAnswer.findUnique({
-      where: { id: id }, // Tìm kiếm theo id
+      where: { id: id }, // Find user answer by 'id'
       include: {
-        UserAnswerDetail: true, // Bao gồm thông tin chi tiết câu trả lời
+        UserAnswerDetail: true, // Include related user answer details
       },
     });
 
@@ -65,7 +58,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "User answer not found" }, { status: 404 });
     }
 
-    return NextResponse.json(userAnswer);
+    return NextResponse.json(userAnswer); // Return the found user answer
   } catch (error) {
     console.error("Error fetching user answer:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

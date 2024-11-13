@@ -51,7 +51,14 @@ export async function GET(req: Request, { params }: { params: { examId: string }
     try {
         const exam = await prisma.exam.findUnique({
             where: { id: examId },
-            include: { userAnswers: true },
+            include: { part1s: true,
+                part2s: true,
+                part3s: true,
+                part4s: true,
+                part5s: true,
+                part6s: true,
+                part7s: true,
+                userAnswers: true,  },
         });
 
         if (!exam) {

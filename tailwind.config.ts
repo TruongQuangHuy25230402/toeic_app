@@ -1,14 +1,14 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 import { withUt } from "uploadthing/tw";
 
-export default withUt ({
+export default withUt({
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -20,44 +20,44 @@ export default withUt ({
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "#E0E0E0",
+        input: "#F2F2F2",
+        ring: "#D4D4D4",
+        background: "#F9F9F9",
+        foreground: "#333333",  // Đổi màu chữ thành đậm để dễ đọc hơn
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#1E40AF", // Màu xanh dương đậm, phù hợp với chủ đề học tập
+          foreground: "#FFFFFF", // Màu chữ trắng nổi bật trên nền xanh
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#0284C7", // Màu xanh đậm hơn
+          foreground: "#FFFFFF",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#DC2626", // Đỏ tươi cho các nút cảnh báo hoặc hành động nguy hiểm
+          foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#D1D5DB", // Màu xám nhạt cho các yếu tố ít quan trọng
+          foreground: "#4B5563", // Màu chữ tối cho các yếu tố không quá nổi bật
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#F59E0B", // Màu cam tươi cho các nút và yếu tố cần chú ý
+          foreground: "#FFFFFF",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#FFFFFF",
+          foreground: "#1F2937", // Màu chữ đen cho popover để dễ đọc
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#FFFFFF", // Nền trắng cho các thẻ
+          foreground: "#111827", // Màu chữ đen cho thẻ
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "8px",
+        md: "6px",
+        sm: "4px",
       },
       keyframes: {
         "accordion-down": {
@@ -75,7 +75,5 @@ export default withUt ({
       },
     },
   },
-  plugins: [require("tailwindcss-animate"),require('tailwindcss-debug-screens'),],
-  
-}) satisfies Config
-
+  plugins: [require("tailwindcss-animate"), require("tailwindcss-debug-screens")],
+}) satisfies Config;

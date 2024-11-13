@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const details = await prisma.userAnswer.findMany({
+    const detailss = await prisma.userAnswer.findMany({
       where: {
         userId: userId, // Filter by userId
       },
@@ -25,6 +25,7 @@ export async function GET(req: Request) {
         numberSkip: true,
         createdAt: true,
         updatedAt: true,
+        timeTaken: true,
         exam: { // Fetch the title from Exam
           select: {
             title: true,
@@ -34,7 +35,7 @@ export async function GET(req: Request) {
     });
 
     // Return the details as JSON
-    return NextResponse.json({ details });
+    return NextResponse.json({ detailss });
   } catch (error) {
     console.error("Error at /api/userAnswer/", error);
     return new NextResponse("Internal Server Error", { status: 500 });

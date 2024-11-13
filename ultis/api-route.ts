@@ -13,6 +13,7 @@ export const USER_API_ROUTES = {
     GET_USERS:"/users",
     GET_PART1:"/exam",
     GET_USER:"/user",
+    GET_QUES:"/ques",
     GET_TOPICS_PART1:"/topicPart1",
     GET_TOPICS_PART2:"/topicPart2",
     GET_TOPICS_PART3:"/topicPart3",
@@ -28,7 +29,12 @@ export const USER_API_ROUTES = {
     GET_data_PART6:"/part6",
     GET_data_PART7:"/part7",
     GET_EXAM:"/exam",
+    GET_EXAMS:"/exams",
     GET_DETAIL:"/userAnswerDetail",
+    GET_DETAILs:"/userAnswerDetailT",
     GET_USER_ANSWER:"/userAnswer",
+    GET_USER_ANSWERs:"/userAnswerT",
+    GET_VOCABULARY:"/vocabulary",
+    GET_GRAMMAR:"/grammar",
 }
 

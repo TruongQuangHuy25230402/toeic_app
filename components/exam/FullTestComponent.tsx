@@ -16,6 +16,7 @@ import { FaArrowUp } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 
+
 type Question =
   | QuestionPart1
   | QuestionPart2
@@ -59,6 +60,7 @@ interface UserAnswer {
   numberCorrect: number;
   numberWrong: number;
   numberSkip: number;
+  timeTaken: string;
   createdAt: Date;
   updatedAt: Date;
   userAnswerDetail: UserAnswerDetail[]; // Đảm bảo có thuộc tính này
@@ -185,15 +187,35 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
   // Lấy câu hỏi cho phần hiện tại
   const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
 
+  const [visibleExplanations, setVisibleExplanations] = useState<{ [key: string]: boolean }>({});
+
+  const toggleExplanation = (questionId: string) => {
+    setVisibleExplanations((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId],
+    }));
+  };
+
  const handleSubmit = async () => {
-    let totalListeningScore = 0;
+    let totalListeningScore =0;
     let totalReadingScore = 0;
     let correctCount = 0;
     let skippedCount = 0;
     let wrongCount = 0;
   
     // Tính thời gian đã sử dụng
-    setTimeTaken(120 * 60 - timeRemaining);
+    const timeTakenSeconds = 120 * 60 - timeRemaining;
+
+// Hàm chuyển đổi giây sang định dạng HH:mm:ss
+const formatTime = (seconds: number): string => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+// Định dạng timeTaken
+const formattedTimeTaken = formatTime(timeTakenSeconds);
   
      // Lấy userId từ local storage
   
@@ -211,6 +233,7 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
       numberCorrect: correctCount,
       numberWrong: wrongCount,
       numberSkip: skippedCount,
+      timeTaken: formattedTimeTaken, // Thêm timeTaken vào đây
       createdAt: new Date(),
       updatedAt: new Date(),
       userAnswerDetail: [],
@@ -339,164 +362,184 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
           </div>
 
           {partQuestions.length === 0 ? (
-  <p>Không có câu hỏi nào được chọn.</p>
-) : (
-  (() => {
-    const groupedQuestions: { [key: string]: any[] } = {};
+        <p>Không có câu hỏi nào được chọn.</p>
+      ) : (
+        (() => {
+          const groupedQuestions: { [key: string]: any[] } = {};
 
-    // Organize questions by groupId
-    partQuestions.forEach((question) => {
-      const groupId = question.groupId || "ungrouped"; // Use "ungrouped" for questions without a groupId
+          // Organize questions by groupId
+          partQuestions.forEach((question) => {
+            const groupId = question.groupId || 'ungrouped';
+            if (!groupedQuestions[groupId]) {
+              groupedQuestions[groupId] = [];
+            }
+            groupedQuestions[groupId].push(question);
+          });
 
-      if (!groupedQuestions[groupId]) {
-        groupedQuestions[groupId] = [];
-      }
-      groupedQuestions[groupId].push(question);
-    });
+          const groupIds = Object.keys(groupedQuestions);
+          let overallIndex = startIndex;
 
-    const groupIds = Object.keys(groupedQuestions);
+          return groupIds.map((groupId) => {
+            const questionsInGroup = groupedQuestions[groupId];
+            if (groupId === 'ungrouped') {
+              return questionsInGroup.map((question) => {
+                const currentIndex = overallIndex++;
+                const images = [question.imageFile, question.imageFile2, question.imageFile3].filter(Boolean);
 
-    let overallIndex = startIndex; // Start from the overall start index
-
-    return groupIds.map((groupId) => {
-      const questionsInGroup = groupedQuestions[groupId];
-
-      // Check if it's an ungrouped question or a group
-      if (groupId === "ungrouped") {
-        // Render ungrouped questions individually
-        return questionsInGroup.map((question) => {
-          const currentIndex = overallIndex++; // Use and increment the overall index
-          const images = [
-            question.imageFile,
-            question.imageFile2,
-            question.imageFile3,
-          ].filter(Boolean);
-
-          return (
-            <div key={question.id} className="mb-4">
-              {images.length > 0 && (
-                <div
-                  className="flex-shrink-0 overflow-y-auto space-y-2 mb-2"
-                  style={{ maxHeight: '500px' }} // Set max height for scrolling
-                >
-                  {images.map((imageFile: string, index: number) => (
-                    <img
-                      key={index}
-                      src={imageFile}
-                      alt={`Hình ảnh ${index + 1}`}
-                      className="mb-2 rounded"
-                      style={{ width: '500px', height: 'auto' }}
-                    />
-                  ))}
-                </div>
-              )}
-              <strong>Câu hỏi {currentIndex + 1}</strong>
-              <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '2' }}>
-                {question.questionText || ""}
-              </h3>
-              
-              {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
-                const answer = (question as any)[answerKey];
-                return answer ? (
-                  <label className="block" key={answerKey}>
-                    <input
-                      type="radio"
-                      name={`question-${question.id}`}
-                      checked={selectedAnswers[question.id] === answer}
-                      onChange={() =>
-                        setSelectedAnswers((prev) => ({
-                          ...prev,
-                          [question.id]: answer,
-                        }))
-                      }
-                    />
-                    {answer}
-                  </label>
-                ) : null;
-              })}
-            </div>
-          );
-        });
-      } else {
-        // Render grouped questions in a single box
-        const images = [
-          questionsInGroup[0]?.imageFile,
-          questionsInGroup[0]?.imageFile2,
-          questionsInGroup[0]?.imageFile3,
-        ].filter(Boolean);
-
-        return (
-          <div key={groupId} className="mb-4">
-           
-            <div className="flex my-4 bg-gray-100 border p-2 rounded">
-              {images.length > 0 && (
-                <div
-                  className="flex-shrink-0 overflow-y-auto space-y-2"
-                  style={{ maxHeight: '400px' }} // Set max height for scrolling
-                >
-                  {images.map((imageFile: string, index: number) => (
-                    <img
-                      key={index}
-                      src={imageFile}
-                      alt={`Hình ảnh ${index + 1} của nhóm câu hỏi ${groupId}`}
-                      className="mb-2 rounded"
-                      style={{ width: '500px', height: 'auto' }}
-                    />
-                  ))}
-                </div>
-              )}
-              <div className="flex-grow overflow-y-auto max-h-60 ml-4">
-                {questionsInGroup.map((question) => {
-                  const currentIndex = overallIndex++; // Use and increment the overall index
-
-                  return (
-                    <div key={question.id} className="my-2">
-                      <div className="mt-2">
-                        <strong>Câu hỏi {currentIndex + 1}</strong>
+                return (
+                  <div key={question.id} className="mb-4">
+                    {images.length > 0 && (
+                      <div className="flex-shrink-0 overflow-y-auto space-y-2 mb-2" style={{ maxHeight: '500px' }}>
+                        {images.map((imageFile: string, index: number) => (
+                          <img key={index} src={imageFile} alt={`Hình ảnh ${index + 1}`} className="mb-2 rounded" style={{ width: '500px', height: 'auto' }} />
+                        ))}
                       </div>
-                      <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '1.5' }}>
-                        {question.questionText || ""}
-                      </h3>
-                      
-                      {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
-                        const answer = (question as any)[answerKey];
-                        return answer ? (
-                          <label className="block" key={answerKey}>
-                            <input
-                              type="radio"
-                              name={`question-${question.id}`}
-                              checked={selectedAnswers[question.id] === answer}
-                              onChange={() =>
-                                setSelectedAnswers((prev) => ({
-                                  ...prev,
-                                  [question.id]: answer,
-                                }))
-                              }
-                            />
-                            {answer}
-                          </label>
-                        ) : null;
+                    )}
+                    <strong>Câu hỏi {currentIndex + 1}</strong>
+                    {question.audioFile && (
+                      <audio controls className="my-2">
+                        <source src={question.audioFile} type="audio/mpeg" />
+                        Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                      </audio>
+                    )}
+                    <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '2' }}>
+                      {question.questionText || ''}
+                    </h3>
+
+                    {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
+                      const answer = (question as any)[answerKey];
+                      return answer ? (
+                        <label className="block" key={answerKey}>
+                          <input
+                            type="radio"
+                            name={`question-${question.id}`}
+                            checked={selectedAnswers[question.id] === answer}
+                            onChange={() =>
+                              setSelectedAnswers((prev) => ({
+                                ...prev,
+                                [question.id]: answer,
+                              }))
+                            }
+                          />
+                          {answer}
+                        </label>
+                      ) : null;
+                    })}
+
+                    {/* Toggle explanation button */}
+                    <button onClick={() => toggleExplanation(question.id)} className="mt-2 text-blue-500">
+                      {visibleExplanations[question.id] ? 'Ẩn transcript' : 'Hiện transcript'}
+                    </button>
+
+                    {/* Explanation display */}
+                    {visibleExplanations[question.id] && (
+                      <p className="mt-2 p-2 bg-gray-100 rounded">{question.explainAnswer}</p>
+                    )}
+                  </div>
+                );
+              });
+            } else {
+              const images = [
+                questionsInGroup[0]?.imageFile,
+                questionsInGroup[0]?.imageFile2,
+                questionsInGroup[0]?.imageFile3,
+              ].filter(Boolean);
+
+              return (
+                <div key={groupId} className="mb-4">
+                  <div className="flex my-4 bg-gray-100 border p-2 rounded">
+                    {images.length > 0 && (
+                      <div className="flex-shrink-0 overflow-y-auto space-y-2" style={{ maxHeight: '400px' }}>
+                        {images.map((imageFile: string, index: number) => (
+                          <img
+                            key={index}
+                            src={imageFile}
+                            alt={`Hình ảnh ${index + 1} của nhóm câu hỏi ${groupId}`}
+                            className="mb-2 rounded"
+                            style={{ width: '500px', height: 'auto' }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex-grow overflow-y-auto max-h-60 ml-4">
+                      {questionsInGroup.map((question) => {
+                        const currentIndex = overallIndex++;
+
+                        return (
+                          <div key={question.id} className="my-2">
+                            <div className="mt-2">
+                              <strong>Câu hỏi {currentIndex + 1}</strong>
+                            </div>
+                            <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '1.5' }}>
+                              {question.questionText || ''}
+                            </h3>
+                            {question.audioFile && (
+                              <audio controls className="my-2">
+                                <source src={question.audioFile} type="audio/mpeg" />
+                                Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                              </audio>
+                            )}
+
+                            {["answer1", "answer2", "answer3", "answer4"].map((answerKey) => {
+                              const answer = (question as any)[answerKey];
+                              return answer ? (
+                                <label className="block" key={answerKey}>
+                                  <input
+                                    type="radio"
+                                    name={`question-${question.id}`}
+                                    checked={selectedAnswers[question.id] === answer}
+                                    onChange={() =>
+                                      setSelectedAnswers((prev) => ({
+                                        ...prev,
+                                        [question.id]: answer,
+                                      }))
+                                    }
+                                  />
+                                  {answer}
+                                </label>
+                              ) : null;
+                            })}
+
+                            {/* Toggle explanation button */}
+                            <button onClick={() => toggleExplanation(question.id)} className="mt-2 text-blue-500">
+                              {visibleExplanations[question.id] ? 'Ẩn transcript' : 'Hiện transcript'}
+                            </button>
+
+                            {/* Explanation display */}
+                            {visibleExplanations[question.id] && (
+                              <p className="mt-2 p-2 bg-gray-100 rounded">{question.explainAnswer}</p>
+                            )}
+                          </div>
+                        );
                       })}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      }
-    });
-  })()
-)}
+                  </div>
+                </div>
+              );
+            }
+          });
+        })()
+      )}
 
-          <div className="mt-4">
-            <button
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Nộp bài
-            </button>
-          </div>
+{[1, 2, 3, 4, 5, 6, 7].length > 0 && currentPart < [1, 2, 3, 4, 5, 6, 7].length && (
+          <button
+            onClick={() => {
+              if (currentPart < [1, 2, 3, 4, 5, 6, 7].length - 1) {
+                // Nếu không phải là phần cuối cùng, chuyển sang phần tiếp theo
+                setCurrentPart((prev) => prev + 1);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              } else {
+                // Nếu đang ở phần cuối cùng, thực hiện hành động nộp bài
+                handleSubmit(); // Gọi hàm nộp bài
+              }
+            }}
+            className="mt-4 bg-blue-500 text-white p-2 rounded"
+          >
+            {currentPart === [1, 2, 3, 4, 5, 6, 7].length - 1
+              ? "Nộp Bài"
+              : "Trang Tiếp Theo"}
+          </button>
+        )}
         </div>
 
         {/* Phần thời gian còn lại và trạng thái câu hỏi đã chọn */}
@@ -553,7 +596,7 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
         <div className="fixed bottom-10 right-10 flex flex-col items-center">
     {/* DictionaryPopup luôn hiển thị */}
     <div className="max-h-48 overflow-y-auto z-20">
-      <DictionaryPopup />
+    <DictionaryPopup />
     </div>
 
     {/* Nút cuộn lên chỉ hiển thị khi người dùng không ở đầu trang */}
