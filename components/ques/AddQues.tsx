@@ -37,8 +37,6 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { UploadButton } from "../uploadthing";
 import dynamic from "next/dynamic";
-import Upload from "../upload/Upload";
-import { QuesProps } from "@/actions/getQuestionP";
 import apiClient from "@/lib/api-client";
 import { USER_API_ROUTES } from "@/ultis/api-route";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
