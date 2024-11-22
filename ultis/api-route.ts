@@ -36,5 +36,6 @@ export const USER_API_ROUTES = {
     GET_USER_ANSWERs:"/userAnswerT",
     GET_VOCABULARY:"/vocabulary",
     GET_GRAMMAR:"/grammar",
+    GET_CONTACT:"/contact",
 }
 

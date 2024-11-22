@@ -222,6 +222,13 @@ model UserAnswer_Detail {
   questionP  Ques? @relation(fields: [questionId], references: [id], name: "UserAnswerDetailP")
 }
 
+model Contact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID tự động, dùng ObjectId của MongoDB
+  fullname  String   @db.String // Tên đầy đủ
+  email     String   @unique @db.String // Email phải duy nhất
+  message   String   @db.String // Tin nhắn
+  createdAt DateTime @default(now()) // Thời gian tạo
+}
 
 
 

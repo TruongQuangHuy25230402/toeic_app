@@ -74,6 +74,13 @@ export default function SideNavbar({}: Props) {
             icon: BookOpenCheck,
             variant: "ghost"
           },
+
+          {
+            title: "Contact",
+            href: "/admin/contact",
+            icon: BookOpenCheck,
+            variant: "ghost"
+          },
           {
             title: "Settings",
             href: "/admin/settings",

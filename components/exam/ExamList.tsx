@@ -43,22 +43,24 @@ const ExamList = ({ exams, userAnswers }: ExamListProps) => {
       </div>
 
       {/* Nút điều hướng */}
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={prevPage}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
-        >
-          Trang trước
-        </button>
-        <button
-          onClick={nextPage}
-          disabled={currentPage >= Math.ceil(exams.length / ExamPerPage)}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
-        >
-          Trang tiếp theo
-        </button>
-      </div>
+      <div className="flex justify-between items-center mt-4 space-x-4">
+  <button
+    onClick={prevPage}
+    disabled={currentPage === 1}
+    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
+  >
+    Trang trước
+  </button>
+  <button
+    onClick={nextPage}
+    disabled={currentPage >= Math.ceil(exams.length / ExamPerPage)}
+    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
+  >
+    Trang tiếp theo
+  </button>
+</div>
+
+
     </div>
   );
 };

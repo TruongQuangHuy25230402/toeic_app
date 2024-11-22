@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import * as z from "zod";
 
 import {
+  ExamQuestion,
   Exams, QuestionsT,
   User,
   User_Answer

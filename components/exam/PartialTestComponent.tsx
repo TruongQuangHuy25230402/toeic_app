@@ -431,9 +431,8 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
   
   return (
     <div className="flex">
-      <div className="w-4/5 p-4 bg-white rounded-lg">
-      
-        <div className="mb-4">
+      <div className="w-full md:w-4/5 p-4 bg-white rounded-lg">
+      <div className="mb-4 flex flex-wrap gap-2">
           {selectedParts.map((part, index) => (
             <button
               key={index}

@@ -41,3 +41,35 @@ export async function DELETE(reg: Request, {params}: {params: {examsId: string}}
     }
 }
 
+export async function GET(req: Request, { params }: { params: { examsId: string } }) {
+    const examsId = params.examsId;
+    console.log("Received examsId:", examsId); // Verify if examsId is received
+
+    if (!examsId) {
+        return NextResponse.json({ message: "Exam ID is required" }, { status: 400 });
+    }
+
+    try {
+        // Fetch all questions where examId matches the provided examsId
+        const exams = await prisma.examQuestion.findMany({
+            where: { examId: examsId },
+            select: {
+                ques: true, // Include related question data
+            }
+        });
+
+        console.log("Prisma exam result:", exams); // Log the exam data received from the database
+
+        if (exams.length === 0) {
+            return NextResponse.json({ message: "No questions found for this exam" }, { status: 404 });
+        }
+
+        return NextResponse.json({ exams });
+    } catch (error) {
+        console.error("Error fetching exam details:", error);
+        return NextResponse.json({ message: "Internal Server Error", error: String(error) }, { status: 500 });
+    }
+}
+
+
+

@@ -61,14 +61,10 @@ const ActionButton = () => {
                   
                   {/* Các liên kết không yêu cầu xác thực */}
                   <Link href="/" className="link-class">Get started</Link>
-                  <Link href="/" className="link-class">Chương trình học</Link>
-                  <Link href="/" className="link-class">Đề thi online</Link>
-                  <Link href="/" className="link-class">Flashcards</Link>
-                  <Link href="/" className="link-class">Khóa học</Link>
-                  <Link href="/" className="link-class">Blog</Link>
-                  <Link href="/" className="link-class">Hỗ trợ</Link>
-                  <Link href="/" className="link-class">Liên hệ</Link>
-                  <Link href="/" className="link-class">Thông tin</Link>
+                  <Link href="/list-exams" className="link-class">Đề thi online</Link>
+                  <Link href="/list" className="link-class">Luyện thi</Link>
+                  <Link href="/lms" className="link-class">Khóa học</Link>
+                  <Link href="/contact" className="link-class">Liên hệ</Link>
                   
                   {/* Nút logout chỉ hiển thị nếu người dùng đã đăng nhập */}
                   {isSignedIn && (

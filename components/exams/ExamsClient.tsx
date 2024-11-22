@@ -5,12 +5,29 @@ import React, { useState, useEffect } from "react";
 import { ExamsWith } from "./AddExams";
 import FullTest from "./FullTest";
 import PartialTest from "./PartialTest";
+import axios from "axios";
+import { ExamQuestion, Exams } from "@prisma/client";
 
+interface Question {
+  id: string;
+  title: string;
+  questionText: string;
+  answer1:       string;
+  answer2:       string;
+  answer3:       string;
+  answer4:       string;
+  correctAnswer: string;      
+  explainAnswer: string;
+  part: string;
+  // Add other fields you need here
+}
 
 
 const ExamClient = ({ exam }: { exam: ExamsWith }) => {
   // State để lưu tab hiện tại: "Thông tin đề thi" hoặc "Đáp án chi tiết"
   const [selectedTab, setSelectedTab] = useState<"info" | "answers">("info");
+
+  
 
   // State để chọn "Làm Full test" hoặc "Làm từng phần"
   const [testMode, setTestMode] = useState<"full" | "partial">("full");
@@ -26,6 +43,8 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
 
   // State để theo dõi số lần làm đề thi
   const [testAttemptCount, setTestAttemptCount] = useState<number>(0);
+
+  const [arr, setArr] = useState<Question[]>([]);
 
 
   // Hàm để chuyển đổi giữa các tab
@@ -62,6 +81,21 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
     };
   }, [testStarted]);
 
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        // Gửi yêu cầu đến API với examId
+        const response = await axios.get(`/api/exams/${exam.id}`);
+        setArr(response.data.arr); // Cập nhật state với danh sách câu hỏi
+        console.log(response.data.exams)
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      }
+    };
+
+    fetchQuestions();
+  }, [exam.id]); // Khi examId thay đổi, useEffect sẽ chạy lại
+
 
   const handleBack = () => {
     if (testStarted) {
@@ -95,6 +129,16 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
             >
               Thông tin đề thi
             </button>
+            <button
+              className={`py-2 px-4 rounded ${
+                selectedTab === "info"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+              onClick={() => handleTabChange("answers")}
+            >
+              Đề thi
+            </button>
             
           </div>
 
@@ -126,7 +170,16 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
                   >
                     Làm Full Test
                   </button>
-                  
+                  <button
+                    className={`py-2 px-4 rounded ${
+                      testMode === "partial"
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => handleTestModeChange("partial")}
+                  >
+                    Làm Từng Phần
+                  </button>
                 </div>
               </div>
 
@@ -177,9 +230,7 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
             <div>
               {/* Nội dung Đáp án chi tiết */}
               <div className="rounded-lg mb-4">
-                <h3 className="font-semibold text-xl md:text-2xl">
-                  Chi tiết
-                </h3>
+                <PartialTest examId={exam.id}/>
               </div>
             </div>
           )}
@@ -190,7 +241,7 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
           {testMode === "full" ? (
             <FullTest exam={exam}  />
           ) : (
-            <div>Done</div>
+            <div></div>
           )}
 
           

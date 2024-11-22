@@ -285,14 +285,14 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
        
 
        {exam.audioFile && (
-    <audio controls className="w-full max-w-lg mb-4">
-      <source src={exam.audioFile} type="audio/mpeg" />
-      Your browser does not support the audio tag.
-    </audio>
+    <audio className="w-full max-w-lg mb-4" autoPlay>
+    <source src={exam.audioFile} type="audio/mpeg" />
+    Your browser does not support the audio tag.
+  </audio>
   )}
       <div className="flex">
-        <div className="w-4/5 p-4 bg-white rounded-lg">
-          <div className="mb-4">
+      <div className="w-full md:w-4/5 p-4 bg-white rounded-lg">
+      <div className="mb-4 flex flex-wrap gap-2">
             {[1, 2, 3, 4, 5, 6, 7].map((part, index) => (
               <button
                 key={index}

@@ -79,7 +79,7 @@ const NavigationBar = () => {
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Luyện thi
+              Đề Thi Toeic
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
@@ -92,20 +92,20 @@ const NavigationBar = () => {
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Luyện thi ngẫu nhiên
+              Luyện thi 
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
           <Link
-            href="/"
+            href="/contact"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior
             passHref
           >
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Chat
+              Liên hệ
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
