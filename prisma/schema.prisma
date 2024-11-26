@@ -409,7 +409,7 @@ model QuestionPart2 {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   examId        String
-  topicId        String?
+  topicId        String
   groupId        String?
 
   Exam Exam? @relation(fields: [examId], references: [id], onDelete: Cascade)
