@@ -60,7 +60,7 @@ const ExamQuestionPage: React.FC = () => {
   };
 
   const handleQuestionClick = (questionId: string) => {
-    router.push(`/questions/${questionId}`); // Redirect to the question page
+    router.push(`/ques/${questionId}`); // Redirect to the question page
   };
 
   // Handle form submission

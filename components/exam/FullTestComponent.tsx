@@ -67,7 +67,10 @@ interface UserAnswer {
 }
 
 
-
+const getRandomSubset = <T,>(array: T[], count: number): T[] => {
+  const shuffled = [...array].sort(() => Math.random() - 0.5); // Xáo trộn
+  return shuffled.slice(0, count); // Lấy `count` phần tử
+};
 
 
 const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
@@ -75,6 +78,7 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: string | null;
   }>({});
+  const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]);
   const [listeningScore, setListeningScore] = useState(0);
   const [readingScore, setReadingScore] = useState(0);
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
@@ -146,16 +150,23 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
   }, []);
   
 
-  // Danh sách câu hỏi cho tất cả các phần từ 1 đến 7
-  const selectedQuestions: Question[] = [
-    ...exam.part1s,
-    ...exam.part2s,
-    ...exam.part3s,
-    ...exam.part4s,
-    ...exam.part5s,
-    ...exam.part6s,
-    ...exam.part7s,
+ // Hàm random câu hỏi cho mỗi phần dựa trên số lượng yêu cầu
+ useEffect(() => {
+  // Random câu hỏi một lần duy nhất khi component được mount
+  const randomQuestions = [
+    ...getRandomSubset(exam.part1s, 6),
+    ...getRandomSubset(exam.part2s, 25),
+    ...getRandomSubset(exam.part3s, 39),
+    ...getRandomSubset(exam.part4s, 30),
+    ...getRandomSubset(exam.part5s, 30),
+    ...getRandomSubset(exam.part6s, 16),
+    ...getRandomSubset(exam.part7s, 54),
   ];
+
+  setSelectedQuestions(randomQuestions);
+}, [exam]);
+
+
 
   useEffect(() => {
     const handleScroll = () => {

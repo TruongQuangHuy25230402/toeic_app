@@ -566,88 +566,25 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
             
           </div>
           {selectedTab === "answers" && (
-                 <div>
-                 {questions && questions.length > 0 ? (
-                   // Display QuestionTable if questions are available
-                   <QuestionTable
-                     questions={questions}
-                     onToggleDetails={toggleDetails}
-                     expandedQuestionId={expandedQuestionId}
-                     onEdit={handleEdit}
-                     onDelete={handleDelete}
-                   />
-                 ) : (
-                   // Display UploadQues if no questions are available
-                   <div className="overflow-x-auto">
-                   <table className="min-w-full bg-white border border-gray-200 shadow-sm rounded-lg">
-                     <thead>
-                       <tr>
-                         <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-                         <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Title</th>
-                         <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Part</th>
-                         <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Question Text</th>
-                         <th className="px-6 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       {questions.map((question) => (
-                         <tr key={question.id}>
-                           <td className="px-6 py-4 border-b border-gray-200 text-sm">{question.id}</td>
-                           <td className="px-6 py-4 border-b border-gray-200 text-sm">{question.title}</td>
-                           <td className="px-6 py-4 border-b border-gray-200 text-sm">{question.part}</td>
-                           <td className="px-6 py-4 border-b border-gray-200 text-sm">
-                             {question.questionText || 'No question text available'}
-                           </td>
-                           <td className="px-6 py-4 border-b border-gray-200 text-sm flex space-x-2">
-                             <button
-                               onClick={() => handleOpenDialog(question)}
-                               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                             >
-                               Chi tiết
-                             </button>
-                             <button
-                               type="button"
-                               onClick={() => handleEdit(question.id)}
-                               className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                             >
-                               Chỉnh sửa
-                             </button>
-                             <button
-                               type="button"
-                               onClick={() => handleDelete(question.id)}
-                               className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                             >
-                               Xóa
-                             </button>
-                           </td>
-                         </tr>
-                       ))}
-                     </tbody>
-                   </table>
-             
-                   {/* Dialog for showing detailed information */}
-                   {selectedQuestion && (
-                     <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-                       <DialogTrigger asChild>
-                         <button className="hidden" />
-                       </DialogTrigger>
-                       <DialogContent>
-                         <DialogTitle>Chi tiết câu hỏi</DialogTitle>
-                         <DialogDescription>
-                           <p><strong>Answer1:</strong> {selectedQuestion.answer1}</p>
-                           <p><strong>Answer2:</strong> {selectedQuestion.answer2}</p>
-                           <p><strong>Answer3:</strong> {selectedQuestion.answer3}</p>
-                           <p><strong>Answer4:</strong> {selectedQuestion.answer4}</p>
-                           <p><strong>Correct Answer:</strong> {selectedQuestion.correctAnswer}</p>
-                           <p><strong>Explain Answer:</strong> {selectedQuestion.explainAnswer}</p>
-                         </DialogDescription>
-                       </DialogContent>
-                     </Dialog>
-                   )}
-                 </div>
-                 )}
-               </div>
-              )}
+  <div>
+    {questions && questions.length > 0 ? (
+      // Display QuestionTable if questions are available
+      <QuestionTable
+        questions={questions}
+        onToggleDetails={toggleDetails}
+        expandedQuestionId={expandedQuestionId}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+    ) : (
+      // Render UploadQues if no questions are available
+      <div className="flex flex-col items-center space-y-4">
+        <p className="text-gray-500 text-center">Hiện chưa có dữ liệu câu hỏi nào. Vui lòng tải lên câu hỏi mới!</p>
+        <UploadQues questions={[]} />
+      </div>
+    )}
+  </div>
+)}
         </form>
       </Form>
 

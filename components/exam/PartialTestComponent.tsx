@@ -63,53 +63,42 @@ type Question =
     userAnswerDetail: UserAnswerDetail[]; // Đảm bảo có thuộc tính này
   }
 
-  const questionsPerPart = {
-    part1: 2,
-    part2: 4,
-    part3: 6,
-    part4: 10,
-    part5: 14,
-    part6: 12,
-    part7: 20,
-  };
-  
-  function getRandomQuestions(questions: Question[], count: number): Question[] {
-    // Group câu hỏi theo groupId
-    const groupedQuestions = questions.reduce<{ [key: string]: Question[] }>((acc, question) => {
-      const groupId = question.groupId || 'no-group'; // Nếu không có groupId, gán vào group 'no-group'
-      if (!acc[groupId]) {
-        acc[groupId] = [];
-      }
-      acc[groupId].push(question);
-      return acc;
-    }, {});
-  
-    // Chọn các nhóm câu hỏi ngẫu nhiên
-    const groupIds = Object.keys(groupedQuestions);
-    const shuffledGroupIds = [...groupIds].sort(() => Math.random() - 0.5); // Xáo trộn các groupId
-  
-    // Chọn câu hỏi từ nhóm xáo trộn, lấy đủ số lượng câu hỏi cần thiết
-    const selectedQuestions: Question[] = [];
-    let questionsRemaining = count;
-  
-    for (const groupId of shuffledGroupIds) {
-      if (questionsRemaining <= 0) break; // Nếu đã chọn đủ số câu hỏi, dừng lại
-      const group = groupedQuestions[groupId];
-      const groupSize = group.length;
-  
-      if (groupSize <= questionsRemaining) {
-        selectedQuestions.push(...group); // Chọn tất cả câu hỏi trong nhóm
-        questionsRemaining -= groupSize;
-      } else {
-        // Nếu nhóm có nhiều hơn câu hỏi cần thiết, chỉ chọn số câu hỏi còn lại
-        const selectedFromGroup = group.slice(0, questionsRemaining);
-        selectedQuestions.push(...selectedFromGroup);
-        questionsRemaining = 0; // Chọn đủ câu hỏi, dừng lại
-      }
+  const questionsPerPart = [6, 25, 39, 30, 30, 16, 54];
+
+function getSequentialQuestions(questions: Question[], count: number): Question[] {
+  // Group câu hỏi theo groupId
+  const groupedQuestions = questions.reduce<{ [key: string]: Question[] }>((acc, question) => {
+    const groupId = question.groupId || 'no-group'; // Nếu không có groupId, gán vào group 'no-group'
+    if (!acc[groupId]) {
+      acc[groupId] = [];
     }
-  
-    return selectedQuestions;
+    acc[groupId].push(question);
+    return acc;
+  }, {});
+
+  // Lấy các nhóm câu hỏi theo thứ tự
+  const groupIds = Object.keys(groupedQuestions); // Không xáo trộn
+  const selectedQuestions: Question[] = [];
+  let questionsRemaining = count;
+
+  for (const groupId of groupIds) {
+    if (questionsRemaining <= 0) break; // Nếu đã chọn đủ số câu hỏi, dừng lại
+    const group = groupedQuestions[groupId];
+    const groupSize = group.length;
+
+    if (groupSize <= questionsRemaining) {
+      selectedQuestions.push(...group); // Chọn tất cả câu hỏi trong nhóm
+      questionsRemaining -= groupSize;
+    } else {
+      // Nếu nhóm có nhiều hơn câu hỏi cần thiết, chỉ chọn số câu hỏi còn lại
+      const selectedFromGroup = group.slice(0, questionsRemaining);
+      selectedQuestions.push(...selectedFromGroup);
+      questionsRemaining = 0; // Chọn đủ câu hỏi, dừng lại
+    }
   }
+
+  return selectedQuestions;
+}
 
 
 
@@ -190,13 +179,14 @@ const PartialTestComponent = ({
   }, []);
 
 
-  
+
 
   useEffect(() => {
-    // Hàm để chọn câu hỏi ngẫu nhiên cho tất cả các phần đã chọn
-    const randomQuestions = selectedParts.reduce<Question[]>((acc, part) => {
+    // Hàm để chọn câu hỏi theo thứ tự cho tất cả các phần đã chọn
+    const sequentialQuestions = selectedParts.reduce<Question[]>((acc, part) => {
       let questions: Question[] = [];
   
+      // Lấy câu hỏi tương ứng với phần
       switch (part) {
         case 1:
           questions = exam.part1s as QuestionPart1[];
@@ -223,17 +213,20 @@ const PartialTestComponent = ({
           break;
       }
   
-      const numberOfQuestionsToSelect = questionsPerPart[`part${part}` as keyof typeof questionsPerPart];
-      const selected = getRandomQuestions(questions, numberOfQuestionsToSelect);
+      // Lấy số lượng câu hỏi cần chọn cho phần hiện tại từ mảng `questionsPerPart`
+      const numberOfQuestionsToSelect = questionsPerPart[part - 1]; // `part - 1` vì mảng bắt đầu từ 0
+  
+      // Lấy câu hỏi tuần tự
+      const selected = questions.slice(0, numberOfQuestionsToSelect);
   
       return acc.concat(selected);
     }, []);
   
     // Cập nhật trạng thái với câu hỏi đã chọn
-    setSelectedQuestions(randomQuestions);
+    setSelectedQuestions(sequentialQuestions);
   
   }, [selectedParts, exam]); // Chỉ gọi khi `selectedParts` hoặc `exam` thay đổi
-
+  
   const [isAtTop, setIsAtTop] = useState(true);
 
   useEffect(() => {
@@ -270,14 +263,14 @@ const PartialTestComponent = ({
   
 
   // Tính toán chỉ mục và số lượng câu hỏi cho phần thi hiện tại
-  const startIndex = selectedParts
-    .slice(0, currentPart) // Lấy các phần đã chọn cho đến phần hiện tại
-    .reduce((acc, curr) => acc + questionsPerPart[`part${curr}` as keyof typeof questionsPerPart], 0);
+const startIndex = selectedParts
+.slice(0, currentPart) // Lấy các phần đã chọn cho đến phần hiện tại
+.reduce((acc, curr) => acc + questionsPerPart[curr - 1], 0); // Sử dụng mảng questionsPerPart
 
-  const count = questionsPerPart[`part${selectedParts[currentPart]}` as keyof typeof questionsPerPart];
+const count = questionsPerPart[selectedParts[currentPart] - 1]; // Lấy số lượng câu hỏi cho phần hiện tại
 
-  // Lấy câu hỏi cho phần hiện tại
-  const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
+// Lấy câu hỏi cho phần hiện tại
+const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
 
   // Track visibility of explanations for each question
   const [visibleExplanations, setVisibleExplanations] = useState<{ [key: string]: boolean }>({});
@@ -641,11 +634,11 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
   const startIndex = selectedParts
     .slice(0, index) // Lấy các phần đã chọn trước phần hiện tại
     .reduce((acc, currPart) => {
-      return acc + questionsPerPart[`part${currPart}` as keyof typeof questionsPerPart]; // Cộng số lượng câu hỏi của các phần trước
+      return acc + questionsPerPart[currPart - 1]; // Sử dụng mảng questionsPerPart (currPart - 1 là vì chỉ mục mảng bắt đầu từ 0)
     }, 0);
 
   // Lấy số câu hỏi cho phần hiện tại
-  const count = questionsPerPart[`part${part}` as keyof typeof questionsPerPart];
+  const count = questionsPerPart[part - 1]; // Sử dụng mảng questionsPerPart
 
   // Lấy câu hỏi cho phần hiện tại từ selectedQuestions
   const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);

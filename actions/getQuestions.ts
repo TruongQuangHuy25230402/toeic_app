@@ -1,6 +1,9 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import * as levenshtein from 'fast-levenshtein'; // Correct way to import
+
+
 export type QuestionsProps = {
   id?: string;
   questionText?: string;
@@ -52,15 +55,53 @@ export async function createQuestions(data: QuestionsProps) {
     console.log(error);
   }
 }
+
 export async function createBulkQuestionss(questionss: QuestionsProps[]) {
   try {
-    for (const questions of questionss) {
-      await createQuestions(questions);
+    // Mảng lưu các câu hỏi đã tồn tại trong hệ thống
+    const existingQuestions = await prisma.questionsT.findMany({
+      where: {
+        // Không cần kiểm tra theo examsId vì bạn muốn kiểm tra tất cả các bài thi cũ
+      },
+    });
+
+    let duplicateCount = 0; // Biến đếm số lượng câu hỏi trùng
+    const maxDuplicates = 100; // Giới hạn số lượng trùng
+
+    // Kiểm tra từng câu hỏi xem có trùng với câu hỏi đã có trong cơ sở dữ liệu không
+    for (const question of questionss) {
+      const existingQuestion = existingQuestions.find(
+        (existing) =>
+          existing.questionText === question.questionText &&
+          existing.explainAnswer === question.explainAnswer
+      );
+
+      // Nếu câu hỏi đã tồn tại, tăng số lượng trùng
+      if (existingQuestion) {
+        duplicateCount++;
+      }
+
+      // Nếu có hơn 100 câu trùng, dừng lại và thông báo lỗi
+      if (duplicateCount >= maxDuplicates) {
+        throw new Error("Đề thi đã được upload. Đã có hơn 50% câu hỏi trùng lặp!");
+      }
     }
+
+    // Nếu số lượng trùng ít hơn 100, tiếp tục thêm câu hỏi mới vào cơ sở dữ liệu
+    if (duplicateCount < maxDuplicates) {
+      for (const question of questionss) {
+        await createQuestions(question); // Thêm câu hỏi mới vào database
+      }
+      console.log(`Đã thêm ${questionss.length} câu hỏi mới.`);
+    }
+
   } catch (error) {
-    console.log(error);
+    console.log("Lỗi trong quá trình thêm dữ liệu:");
+    throw error;  // Ném lại lỗi nếu cần xử lý tiếp
   }
 }
+
+
 
 export async function deleteQuestionss(examsId: string) {
   try {

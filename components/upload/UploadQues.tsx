@@ -51,20 +51,25 @@ const UploadQues = ({ questions }: { questions: QuestionsProps[] }) => {
           const sheetName = workbook.SheetNames[0];
           const workSheet = workbook.Sheets[sheetName];
           const json: QuestionsProps[] = XLSX.utils.sheet_to_json(workSheet);
-
+  
           // Add examsId to each question if it's missing in the Excel file
           const dataWithexamsId = json.map((item) => ({
             ...item,
             examsId: item.examsId || examsId, // Assign examsId from the URL
           }));
-
+  
           try {
             await createBulkQuestionss(dataWithexamsId);
             setLoading(false);
             // Reload the current page instead of redirecting
             window.location.reload();
-          } catch (error) {
+          } catch (error: unknown) {
             console.log(error);
+            if (error instanceof Error) {
+              alert(error.message);  // Hiển thị hộp thoại alert với thông báo lỗi
+            } else {
+              alert("An unknown error occurred");
+            }
             setLoading(false);
           }
         }
@@ -74,6 +79,7 @@ const UploadQues = ({ questions }: { questions: QuestionsProps[] }) => {
       alert("Please select a file before uploading.");
     }
   }
+  
 
   async function clearData() {
     const confirmClear = window.confirm(
