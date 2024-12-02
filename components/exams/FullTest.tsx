@@ -486,7 +486,41 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
             {Math.floor(timeRemaining / 60)} phút {timeRemaining % 60} giây
           </p>
 
-          
+          <h3 className="mt-4 font-bold">Trạng thái câu hỏi đã chọn:</h3>
+
+          {[1, 2, 3, 4, 5, 6, 7].map((part) => {
+            const count = questionsPerPart[part - 1]; // Số câu hỏi cho phần này
+            const startIndex = questionsPerPart
+              .slice(0, part - 1)
+              .reduce((acc, curr) => acc + curr, 0); // Tính chỉ số bắt đầu cho phần
+            const partQuestions = selectedQuestions.slice(
+              startIndex,
+              startIndex + count
+            ); // Lấy câu hỏi cho phần hiện tại
+
+            return (
+              <div key={part} className="mt-2">
+                <h4 className="font-semibold">Part {part}</h4>
+                <div className="flex flex-wrap">
+                  {partQuestions.map((question, index) => (
+                    <div
+                      key={question.id}
+                      className={`w-6 h-6 rounded-full mr-2 mb-2 ${selectedAnswers[question.id] ? "bg-blue-500" : "bg-gray-300"}`}
+                      onClick={() => {
+                        setCurrentPart(part - 1); // Chuyển đến part tương ứng (bằng cách giảm 1 vì index bắt đầu từ 0)
+                        window.scrollTo({ top: 0, behavior: "smooth" }); // Cuộn trang lên đầu
+                      }}
+                      style={{ cursor: "pointer" }} // Thêm cursor pointer để tạo cảm giác tương tác
+                    >
+                      <span className="text-white text-xs flex justify-center items-center h-full">
+                        {startIndex + index + 1}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
 
           <button
             onClick={handleSubmit}
