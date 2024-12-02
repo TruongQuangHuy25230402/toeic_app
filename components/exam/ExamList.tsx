@@ -4,6 +4,8 @@ import { ExamWithParts } from "./AddToeicExamForm";
 import { useState } from "react";
 import ExamCard from "./ExamCard";
 import { UserAnswer } from "@prisma/client";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 interface ExamListProps {
   exams: ExamWithParts[];
@@ -18,6 +20,7 @@ const ExamList = ({ exams, userAnswers }: ExamListProps) => {
   const indexOfLastExam = currentPage * ExamPerPage;
   const indexOfFirstExam = indexOfLastExam - ExamPerPage;
   const currentExams = exams.slice(indexOfFirstExam, indexOfLastExam);
+  const router = useRouter(); // Sử dụng useRouter để điều hướng
 
   // Hàm chuyển đến trang trước hoặc sau
   const nextPage = () => {
@@ -32,8 +35,14 @@ const ExamList = ({ exams, userAnswers }: ExamListProps) => {
     }
   };
 
+  // Hàm xử lý Random Test
+  const handleRandomTest = () => {
+      router.push(`details/cm371olq10000113ljzn9zzt2`); // Điều hướng đến đường dẫn với ID ngẫu nhiên
+  };
+
   return (
     <div>
+      <Button onClick={handleRandomTest}>Random Test</Button>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
         {currentExams.map((exam) => (
           <div key={exam.id} className="flex justify-center">

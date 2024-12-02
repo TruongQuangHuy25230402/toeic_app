@@ -164,6 +164,7 @@ const AddToeicExamForm = ({ exam, part5, part1, part2, part3, part4, part6, part
             variant: "default",
             description: "Exam Update!",
           });
+          alert("Exam Update!")
           router.push(`/exam/${res.data.id}`);
           setIsLoading(false);
         })
@@ -184,6 +185,7 @@ const AddToeicExamForm = ({ exam, part5, part1, part2, part3, part4, part6, part
             variant: "default",
             description: "Exam created!",
           });
+          alert("Exam Created!")
           router.push(`/exam/${res.data.id}`);
           setIsLoading(false);
         })
@@ -193,6 +195,7 @@ const AddToeicExamForm = ({ exam, part5, part1, part2, part3, part4, part6, part
             variant: "destructive",
             description: "Some thing went wrong!",
           });
+          alert("Some thing went wrong!")
           setIsLoading(false);
         });
     }

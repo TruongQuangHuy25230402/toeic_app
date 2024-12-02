@@ -153,6 +153,7 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
             variant: "default",
             description: "exams Update!",
           });
+          alert("Exam Update!")
           router.push(`/exams/${res.data.id}`);
           setIsLoading(false);
         })
@@ -172,6 +173,7 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
             variant: "default",
             description: "exams created.",
           });
+          alert("Exam Created!")
           router.push(`/exams/${res.data.id}`);
           setIsLoading(false);
         })
@@ -181,6 +183,7 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
             variant: "destructive",
             description: "Some thing went wrong!",
           });
+          alert("Some thing went wrong!")
           setIsLoading(false);
         });
     }

@@ -208,6 +208,15 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
   };
 
  const handleSubmit = async () => {
+
+  // Hiển thị thông báo xác nhận
+  const isConfirmed = window.confirm("Bạn có chắc chắn muốn nộp bài?");
+  
+  // Nếu người dùng không đồng ý, thoát khỏi hàm
+  if (!isConfirmed) {
+    return;
+  }
+  
     let totalListeningScore =0;
     let totalReadingScore = 0;
     let correctCount = 0;
@@ -444,8 +453,10 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
 
                     {/* Explanation display */}
                     {visibleExplanations[question.id] && (
-                      <p className="mt-2 p-2 bg-gray-100 rounded">{question.explainAnswer}</p>
-                    )}
+  <p className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-md text-blue-900">
+    {question.explainAnswer}
+  </p>
+)}
                   </div>
                 );
               });

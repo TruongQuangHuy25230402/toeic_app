@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Result from "./Result";
 import DictionaryPopup from "./dictionary";
 import { FaArrowDown, FaArrowUp, FaPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import {
   Exam,
   Grammar,
@@ -17,6 +18,7 @@ import {
 import { useRouter } from "next/navigation";
 import HighlightableText from "../HighlightableAnswer";
 import { Button } from "../ui/button";
+import { useLocation } from "react-router-dom";
 
 
 type Question =
@@ -145,6 +147,8 @@ const PartialTestComponent = ({
 
 
   const [userId, setUserId] = useState<string>(''); // Giá trị ban đầu là chuỗi rỗng
+
+
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -285,6 +289,15 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
 
 
   const handleSubmit = async () => {
+
+    // Hiển thị thông báo xác nhận
+  const isConfirmed = window.confirm("Bạn có chắc chắn muốn nộp bài?");
+  
+  // Nếu người dùng không đồng ý, thoát khỏi hàm
+  if (!isConfirmed) {
+    return;
+  }
+  
     let totalListeningScore = 0;
     let totalReadingScore = 0;
     let correctCount = 0;
@@ -509,8 +522,10 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
 
                     {/* Explanation display */}
                     {visibleExplanations[question.id] && (
-                      <p className="mt-2 p-2 bg-gray-100 rounded">{question.explainAnswer}</p>
-                    )}
+  <p className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-md text-blue-900">
+    {question.explainAnswer}
+  </p>
+)}
                   </div>
                 );
               });
