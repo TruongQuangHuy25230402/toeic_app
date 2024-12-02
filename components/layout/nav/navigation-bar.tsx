@@ -99,6 +99,19 @@ const NavigationBar = () => {
 
         <NavigationMenuItem>
           <Link
+            href="/details/cm371olq10000113ljzn9zzt2"
+            className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
+            legacyBehavior
+            passHref
+          >
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Bài thi ngẫu nhiên 
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link
             href="/contact"
             className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
             legacyBehavior

@@ -35,14 +35,10 @@ const ExamList = ({ exams, userAnswers }: ExamListProps) => {
     }
   };
 
-  // Hàm xử lý Random Test
-  const handleRandomTest = () => {
-      router.push(`details/cm371olq10000113ljzn9zzt2`); // Điều hướng đến đường dẫn với ID ngẫu nhiên
-  };
 
   return (
     <div>
-      <Button onClick={handleRandomTest}>Random Test</Button>
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
         {currentExams.map((exam) => (
           <div key={exam.id} className="flex justify-center">

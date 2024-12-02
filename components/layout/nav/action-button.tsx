@@ -63,6 +63,7 @@ const ActionButton = () => {
                   <Link href="/" className="link-class">Get started</Link>
                   <Link href="/list-exams" className="link-class">Đề thi online</Link>
                   <Link href="/list" className="link-class">Luyện thi</Link>
+                  <Link href="/details/cm371olq10000113ljzn9zzt2" className="link-class">Bài thi ngẫu nhiên</Link>
                   <Link href="/lms" className="link-class">Khóa học</Link>
                   <Link href="/contact" className="link-class">Liên hệ</Link>
                   
