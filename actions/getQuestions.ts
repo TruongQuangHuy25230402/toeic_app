@@ -79,11 +79,10 @@ export async function createBulkQuestionss(questionss: QuestionsProps[]) {
       }
     }
 
-    await Promise.all(
-      questionss.map(async (question) => {
-        await createQuestions(question);
-      })
-    );
+    // Synchronously insert questions to ensure order
+    for (const question of questionss) {
+      await createQuestions(question);
+    }
 
     console.log(`Successfully added ${questionss.length - duplicateCount} new questions.`);
   } catch (error) {
