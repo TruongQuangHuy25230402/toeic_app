@@ -70,8 +70,45 @@ const FullTest = ({ exam }: { exam: ExamProps }) => {
   const questionsPerPart = [6, 25, 39, 30, 30, 16, 54];
   const [userId, setUserId] = useState<string>(''); // Giá trị ban đầu là chuỗi rỗng
 
-  
-  
+  const [isModified, setIsModified] = useState(false); // Trạng thái khi người dùng đã thay đổi gì đó
+
+  // Hàm đánh dấu khi có sự thay đổi (ví dụ: người dùng trả lời câu hỏi)
+  const handleChange = () => {
+    setIsModified(true);
+  };
+
+  // Cài đặt sự kiện beforeunload để hiển thị cảnh báo khi rời trang
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isModified) {
+        const message = "Bạn chuẩn bị rời trang này. Bạn có chắc chắn muốn rời đi?";
+        event.returnValue = message; // Thêm cảnh báo cho trình duyệt
+        return message; // Cảnh báo với các trình duyệt cũ
+      }
+    };
+
+    // Thêm sự kiện trước khi rời trang
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Dọn dẹp sự kiện khi component bị hủy
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isModified]);
+
+  // Hàm kiểm tra khi người dùng bấm vào liên kết để rời trang
+  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+    if (isModified) {
+      const confirmExit = window.confirm(
+        "Bạn chuẩn bị rời trang này. Bạn có chắc chắn muốn rời đi?"
+      );
+      if (!confirmExit) {
+        e.preventDefault(); // Ngừng hành động điều hướng nếu người dùng không xác nhận
+      } else {
+        router.push(href); // Nếu người dùng xác nhận, tiếp tục điều hướng
+      }
+    }
+  };
 
   useEffect(() => {
     const countdown = setInterval(() => {
@@ -116,6 +153,8 @@ useEffect(() => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+ 
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -291,7 +330,11 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
 
 
   return (
+    
     <div className="flex flex-col items-center mb-6">
+    {/* Nếu có thay đổi, thông báo */}
+    {isModified && <p>Bạn đã thay đổi câu trả lời. Hãy lưu lại nếu muốn tránh mất dữ liệu!</p>}
+
        <h1 className="text-2xl font-bold mb-4">Bài thi: {exam.title}</h1>
        
 

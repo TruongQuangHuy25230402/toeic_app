@@ -19,6 +19,9 @@ import { useRouter } from "next/navigation";
 import HighlightableText from "../HighlightableAnswer";
 import { Button } from "../ui/button";
 import { useLocation } from "react-router-dom";
+import useBeforeUnload from "../useBeforeUnload";
+import useBackNavigation from "../useBackNavigation";
+import usePreventNavigation from "../usePreventNavigation";
 
 
 type Question =
@@ -141,7 +144,7 @@ const PartialTestComponent = ({
   const listeningParts = [1, 2, 3, 4]; // Listening parts
   const readingParts = [5, 6, 7]; // Reading parts
   const [currentPart, setCurrentPart] = useState(0);
-  
+  const [isExamOngoing, setIsExamOngoing] = useState(true); // Trạng thái làm bài thi
   
 
 
@@ -149,6 +152,11 @@ const PartialTestComponent = ({
   const [userId, setUserId] = useState<string>(''); // Giá trị ban đầu là chuỗi rỗng
 
 
+  // Hook chặn reload hoặc thoát trang
+  useBeforeUnload(isExamOngoing);
+  useBackNavigation(isExamOngoing);
+  usePreventNavigation(isExamOngoing && timeRemaining > 0);
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {

@@ -33,7 +33,7 @@ export const CourseSidebar = async ({ course, progressCount }: CourseSidebarProp
   return (
     <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
       <div className="p-8 flex-col border-b">
-        <h1 className="font-semibold">{course.title}</h1>
+        <h1 className="mt-10 font-semibold">{course.title}</h1>
         {purchase && (
           <div className = "mt-10">
               <CourseProgress
