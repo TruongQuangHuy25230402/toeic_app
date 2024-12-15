@@ -4,8 +4,14 @@ import ExamList from '@/components/exam/ExamList';
 import UserInfo from '@/components/user/UserInfo';
 import React from 'react'
 
-const MyExams = async () => {
-  const exams = await getExams();
+interface ExamsPropsss {
+  searchParams: {
+    title: string;
+  };
+}
+
+const MyExams = async ({ searchParams }: ExamsPropsss) => {
+  const exams = await getExams(searchParams);
   const userAnswers = await getUserAnswer();
 
 

@@ -58,19 +58,7 @@ const NavigationBar = () => {
   return (
     <NavigationMenu>
       <NavigationMenuList className="hidden md:flex md:space-x-4">
-        <NavigationMenuItem>
-          <Link
-            href="/"
-            className={`${pathname === "/" ? "text-danger-500" : "text-white"}`}
-            legacyBehavior
-            passHref
-          >
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Trang chủ
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
+        
         <NavigationMenuItem>
           <Link
             href="/list-exams"

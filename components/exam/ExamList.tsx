@@ -6,6 +6,7 @@ import ExamCard from "./ExamCard";
 import { UserAnswer } from "@prisma/client";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation"; // Import useRouter
+import Search from "./Search";
 
 interface ExamListProps {
   exams: ExamWithParts[];
@@ -38,7 +39,7 @@ const ExamList = ({ exams, userAnswers }: ExamListProps) => {
 
   return (
     <div>
-      
+      <Search />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
         {currentExams.map((exam) => (
           <div key={exam.id} className="flex justify-center">

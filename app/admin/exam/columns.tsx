@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
   id:          string;      
   title:       string;
   description: string;
+  userId: string;
   createdAt:   Date;   
   updatedAt:   Date;    
 
@@ -81,6 +82,10 @@ import { useRouter } from "next/navigation";
     {
       accessorKey: "title",
       header: "Title",
+    },
+    {
+      accessorKey: "userId",
+      header: "UserID",
     },
     {
         accessorKey: "createdAt",

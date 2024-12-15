@@ -1,11 +1,16 @@
 import prisma from "@/lib/prisma";
 
 //Lấy toàn bộ Exam có trong db bao gồm các câu hỏi 7 part
-export const getExams = async()=>{
+export const getExams = async(searchParams: {
+    title: string;
+})=>{
     try{
+        const{title} = searchParams;
         const exams = await prisma.exam.findMany({
             where: {
-                
+                title:{
+                    contains: title,
+                },
             }, include: {
                 part1s: true,
                 part2s: true,

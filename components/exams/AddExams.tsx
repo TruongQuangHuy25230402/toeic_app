@@ -582,8 +582,7 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
     ) : (
       // Render UploadQues if no questions are available
       <div className="flex flex-col items-center space-y-4">
-        <p className="text-gray-500 text-center">Hiện chưa có dữ liệu câu hỏi nào. Vui lòng tải lên câu hỏi mới!</p>
-        <UploadQues questions={[]} />
+          <UploadQues questions={[]} />
       </div>
     )}
   </div>

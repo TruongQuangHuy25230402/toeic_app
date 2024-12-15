@@ -645,7 +645,7 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
       </div>
       <div className="w-1/5 p-4 bg-gray-100 rounded-lg ml-4 mt-8 mb-9">
         {/* Thay đổi từ w-1/3 thành w-1/5 */}
-        <h2 className="text-lg font-bold">Thời gian còn lại</h2>
+        <h2 className="text-lg font-bold text-blue-500">Thời gian còn lại</h2>
         <p>
           {Math.floor(timeRemaining / 60)} phút {timeRemaining % 60} giây
         </p>

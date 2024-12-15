@@ -129,16 +129,7 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
             >
               Thông tin đề thi
             </button>
-            <button
-              className={`py-2 px-4 rounded ${
-                selectedTab === "info"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
-              }`}
-              onClick={() => handleTabChange("answers")}
-            >
-              Đề thi
-            </button>
+            
             
           </div>
 
@@ -170,16 +161,7 @@ const ExamClient = ({ exam }: { exam: ExamsWith }) => {
                   >
                     Làm Full Test
                   </button>
-                  <button
-                    className={`py-2 px-4 rounded ${
-                      testMode === "partial"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-200"
-                    }`}
-                    onClick={() => handleTestModeChange("partial")}
-                  >
-                    Làm Từng Phần
-                  </button>
+                 
                 </div>
               </div>
 

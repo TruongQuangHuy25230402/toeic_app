@@ -6,6 +6,9 @@ import { useState } from "react";
 import { User_Answer, UserAnswer } from "@prisma/client";
 import { ExamsWith} from "./AddExams";
 import ExamsCard from "./ExamsCard";
+import SearchInput from "../SearchInput";
+
+
 
 interface ExamsListProps {
   exams: ExamsWith[];
@@ -36,6 +39,8 @@ const ExamsList = ({ exams, user_Answers }: ExamsListProps) => {
 
   return (
     <div>
+
+      <SearchInput />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
         {currentExams.map((exam) => (
           <div key={exam.id} className="flex justify-center">

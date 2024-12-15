@@ -26,24 +26,24 @@ export function Action() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => {
-            router.push("/");
+            router.push("/stats");
           }}
         >
-          Home1
+          Stats
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            router.push("/");
+            router.push("/leaderboards");
           }}
         >
-          Home2
+          Leaderboard
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            router.push("/");
+            router.push("/statistics");
           }}
         >
-         Home3
+         Statistics
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
