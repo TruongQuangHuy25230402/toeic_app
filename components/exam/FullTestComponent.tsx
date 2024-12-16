@@ -159,8 +159,8 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
     ...getRandomSubset(exam.part3s, 39),
     ...getRandomSubset(exam.part4s, 30),
     ...getRandomSubset(exam.part5s, 30),
-    ...getRandomSubset(exam.part6s, 16),
-    ...getRandomSubset(exam.part7s, 54),
+    ...exam.part6s, // Giữ nguyên part6
+    ...exam.part7s, // Giữ nguyên part7
   ];
 
   setSelectedQuestions(randomQuestions);
@@ -566,10 +566,10 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
 
         {/* Phần thời gian còn lại và trạng thái câu hỏi đã chọn */}
         <div className="w-1/5 p-4 bg-gray-100 rounded-lg ml-4 mt-8 mb-9">
-          <h2 className="text-lg font-bold">Thời gian còn lại</h2>
-          <p>
-            {Math.floor(timeRemaining / 60)} phút {timeRemaining % 60} giây
-          </p>
+        <h2 className="text-lg font-bold">Thời gian còn lại</h2>
+<p className="text-2xl font-bold text-red-600 bg-yellow-100 p-2 rounded">
+  {Math.floor(timeRemaining / 60)} phút {timeRemaining % 60} giây
+</p>
 
           <h3 className="mt-4 font-bold">Trạng thái câu hỏi đã chọn:</h3>
 
