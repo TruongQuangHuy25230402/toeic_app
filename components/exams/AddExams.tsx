@@ -192,6 +192,13 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
 
   //Hàm xóa exams
   const handelDeleteexams = async (exams: ExamsWith) => {
+    const isConfirmed = window.confirm("Bạn có chắc chắn muốn xóa bài thi này không?");
+    if (!isConfirmed) {
+      // Nếu người dùng chọn "Hủy bỏ", dừng thực hiện hàm
+      return;
+    }
+
+    
     setIsexamsDeleting(true);
     try {
       await axios.delete(`/api/exams/${exams.id}`);
@@ -539,7 +546,6 @@ const AddExams = ({ exams, question }: AddExamsFormProps) => {
                 <div className="w-full md:w-[30%] flex flex-col gap-6">
               {exams && !!exams.questions.length && (
                 <div>
-                  <h3>Part 1</h3>
                   <Separator />
                   <div className="flex justify-between gap-4 flex-wrap mt-2">
                   <div>
