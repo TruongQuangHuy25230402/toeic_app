@@ -312,8 +312,7 @@ const partQuestions = selectedQuestions.slice(startIndex, startIndex + count);
     let skippedCount = 0;
     let wrongCount = 0;
     
-    // Tính thời gian đã sử dụng
-    const timeTakenSeconds = 120 * 60 - timeRemaining;
+    const timeTakenSeconds = Math.max(0, (timeLimit * 60) - timeRemaining); // Không để âm
 
 // Hàm chuyển đổi giây sang định dạng HH:mm:ss
 const formatTime = (seconds: number): string => {
@@ -440,13 +439,16 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
     
   };
 
-  
+  console.log(timeLimit);
+  console.log(timeRemaining)
+
 
   
   return (
     <div className="flex">
       <div className="w-full md:w-4/5 p-4 bg-white rounded-lg">
       <div className="mb-4 flex flex-wrap gap-2">
+
           {selectedParts.map((part, index) => (
             <button
               key={index}

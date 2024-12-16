@@ -80,6 +80,9 @@ const UserAnswerT = () => {
                       <li>{questionPart.answer4 || 'N/A'}</li>
                     </ul>
                   </div>
+                  <p className="text-lg text-gray-700 mt-4">
+                <span className="font-semibold">Correct Answer:</span> {questionPart.correctAnswer}
+              </p>
                   {questionPart.explainAnswer && (
                     <div className="mt-4">
                       <h4 className="text-lg font-semibold text-gray-800">Explanation:</h4>
