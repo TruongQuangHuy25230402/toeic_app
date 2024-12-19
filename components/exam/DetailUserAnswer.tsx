@@ -30,31 +30,7 @@ const DetailUserAnswer = ({ userId }: DetailUserAnswerProps) => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     
-    const [filterRange, setFilterRange] = useState('30 ngày');
-    const timeOptions = [
-        { label: '-- Chọn khoảng thời gian --', value: '' },
-        { label: 'Tất cả', value: 'all' },
-        { label: '3 ngày gần nhất', value: 3 },
-        { label: '7 ngày gần nhất', value: 7 },
-        { label: '30 ngày', value: 30 },
-        { label: '60 ngày', value: 60 },
-        { label: '90 ngày', value: 90 },
-        { label: '6 tháng', value: 180 },
-        { label: '1 năm', value: 365 },
-    ];
-    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setFilterRange(value);
-    
-        if (value === 'all' || value === '') {
-            setStartDate(null); // Không áp dụng bộ lọc ngày
-        } else {
-            const days = parseInt(value, 10);
-            const newStartDate = new Date();
-            newStartDate.setDate(newStartDate.getDate() - days);
-            setStartDate(newStartDate);
-        }
-    };
+
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -84,22 +60,7 @@ const DetailUserAnswer = ({ userId }: DetailUserAnswerProps) => {
     
 </div>
             <h2 className="text-lg font-bold mb-4">Tổng hợp các đề thi của người dùng
-            <select
-        value={filterRange}
-        onChange={handleFilterChange}
-        className="border border-gray-300 rounded px-3 py-2"
-    >
-        {timeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-                {option.label}
-            </option>
-        ))}
-    </select>
-    <button
-        className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-    >
-        Search
-    </button>
+        
             </h2>
             {loading ? (
                 <p>Loading data...</p>
