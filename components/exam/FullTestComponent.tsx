@@ -94,9 +94,14 @@ const FullTestComponent = ({ exam }: { exam: ExamProps }) => {
   const readingParts = [5, 6, 7]; // Reading parts
   const questionsPerPart = [6, 25, 39, 30, 30, 16, 54];
   const [userId, setUserId] = useState<string>(''); // Giá trị ban đầu là chuỗi rỗng
- 
-
-  
+ const [highlightedQuestions, setHighlightedQuestions] = React.useState<{ [key: string]: boolean }>({});
+   const toggleHighlight = (question: any) => {
+     const questionId = question.id; // Chỉ sử dụng ID của câu hỏi cụ thể
+     setHighlightedQuestions((prev) => ({
+       ...prev,
+       [questionId]: !prev[questionId], // Đảo trạng thái đánh dấu của câu hỏi cụ thể
+     }));
+   };
 
   
   // ...
@@ -407,7 +412,7 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
                 const images = [question.imageFile, question.imageFile2, question.imageFile3].filter(Boolean);
 
                 return (
-                  <div key={question.id} className="mb-4">
+                  <div key={question.id} className={`mb-4 ${highlightedQuestions[question.id]}`}>
                     {images.length > 0 && (
                       <div className="flex-shrink-0 overflow-y-auto space-y-2 mb-2" style={{ maxHeight: '500px' }}>
                         {images.map((imageFile: string, index: number) => (
@@ -416,6 +421,11 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
                       </div>
                     )}
                     <strong>Câu hỏi {currentIndex + 1}</strong>
+                    <button
+      onClick={() => toggleHighlight(question)}
+    >
+      {highlightedQuestions[question.id] ? '🚩 Bỏ đánh dấu' : '🏳️ Đánh dấu'}
+    </button>
                     {question.audioFile && (
                       <audio controls className="my-2">
                         <source src={question.audioFile} type="audio/mpeg" />
@@ -491,6 +501,11 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
                           <div key={question.id} className="my-2">
                             <div className="mt-2">
                               <strong>Câu hỏi {currentIndex + 1}</strong>
+                              <button
+      onClick={() => toggleHighlight(question)}
+    >
+      {highlightedQuestions[question.id] ? '🚩 Bỏ đánh dấu' : '🏳️ Đánh dấu'}
+    </button>
                             </div>
                             <h3 className="font-semibold overflow-y-auto max-h-24 p-2 bg-white rounded" style={{ lineHeight: '1.5' }}>
                               {question.questionText || ''}
@@ -585,25 +600,31 @@ const formattedTimeTaken = formatTime(timeTakenSeconds);
 
             return (
               <div key={part} className="mt-2">
-                <h4 className="font-semibold">Part {part}</h4>
-                <div className="flex flex-wrap">
-                  {partQuestions.map((question, index) => (
-                    <div
-                      key={question.id}
-                      className={`w-6 h-6 rounded-full mr-2 mb-2 ${selectedAnswers[question.id] ? "bg-blue-500" : "bg-gray-300"}`}
-                      onClick={() => {
-                        setCurrentPart(part - 1); // Chuyển đến part tương ứng (bằng cách giảm 1 vì index bắt đầu từ 0)
-                        window.scrollTo({ top: 0, behavior: "smooth" }); // Cuộn trang lên đầu
-                      }}
-                      style={{ cursor: "pointer" }} // Thêm cursor pointer để tạo cảm giác tương tác
-                    >
-                      <span className="text-white text-xs flex justify-center items-center h-full">
-                        {startIndex + index + 1}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+  <h4 className="font-semibold">Part {part}</h4>
+  <div className="flex flex-wrap">
+    {partQuestions.map((question, i) => (
+      <div
+        key={question.id}
+        className={`w-6 h-6 rounded-full mr-2 mb-2 ${
+          highlightedQuestions[question.id]
+            ? "bg-yellow-500"
+            : selectedAnswers[question.id]
+            ? "bg-blue-500"
+            : "bg-gray-300"
+        }`}
+        onClick={() => {
+          setCurrentPart(part - 1); // Chuyển đến phần tương ứng
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        <span className="text-white text-xs flex justify-center items-center h-full">
+          {startIndex + i + 1}
+        </span>
+      </div>
+    ))}
+  </div>
+</div>
             );
           })}
 

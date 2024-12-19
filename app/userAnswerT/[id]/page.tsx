@@ -80,10 +80,6 @@ const UserAnswers = async ({ params }: UserPageProps) => {
                   </div>
                 </div>
               </div>
-              {/* User Answer Detail */}
-              <h1> Thống kê kết quả </h1>
-              
-          <UserAnswerT />
             </div>
 
             {/* 20% Left Panel with UserInfo */}
